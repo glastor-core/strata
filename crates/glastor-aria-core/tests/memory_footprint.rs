@@ -18,7 +18,7 @@ fn test_byte_gauge_memory_compactness() {
     assert!(size_of::<TabsActivationMode>() <= 1);
     assert!(size_of::<ToastPriority>() <= 1);
     assert!(size_of::<GridSelectionMode>() <= 1);
-    assert!(size_of::<CellCoord>() == 8); // two u32s
+    assert_eq!(size_of::<CellCoord>(), 8); // two u32s
     assert!(size_of::<FocusTrapState>() <= 32);
 
     println!(
