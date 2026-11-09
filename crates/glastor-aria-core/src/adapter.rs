@@ -93,3 +93,49 @@ impl<A: Clone + Debug> ActionSink<A> for ActionRecorder<A> {
         self.recorded.lock().expect("mutex poisoned").push(action);
     }
 }
+
+/// Universal reactive wrapper connecting any `StateMachine` to a reactive signal and an action sink.
+///
+/// Designed to be compatible with Leptos `RwSignal`, Dioxus `Signal`, or in-memory testing cells.
+#[derive(Debug, Clone)]
+pub struct ReactiveFsm<
+    M: crate::fsm::StateMachine,
+    S: ReactiveState<M::State>,
+    K: ActionSink<M::Action>,
+> {
+    machine: std::sync::Arc<std::sync::Mutex<M>>,
+    state_signal: S,
+    action_sink: K,
+}
+
+impl<M: crate::fsm::StateMachine, S: ReactiveState<M::State>, K: ActionSink<M::Action>>
+    ReactiveFsm<M, S, K>
+{
+    /// Connects an existing FSM instance to a reactive signal and an action sink.
+    pub fn new(machine: M, state_signal: S, action_sink: K) -> Self {
+        state_signal.set(machine.state().clone());
+        Self {
+            machine: std::sync::Arc::new(std::sync::Mutex::new(machine)),
+            state_signal,
+            action_sink,
+        }
+    }
+
+    /// Dispatches an event into the machine, atomically updating the reactive signal
+    /// and routing emitted actions to the sink.
+    pub fn send(&self, event: M::Event) -> Vec<M::Action> {
+        let (actions, new_state) = {
+            let mut guard = self.machine.lock().expect("mutex poisoned");
+            let acts = guard.transition(event);
+            (acts, guard.state().clone())
+        };
+        self.state_signal.set(new_state);
+        self.action_sink.emit_all(actions.clone());
+        actions
+    }
+
+    /// Returns a clone of the current reactive state.
+    pub fn state(&self) -> M::State {
+        self.state_signal.get()
+    }
+}
