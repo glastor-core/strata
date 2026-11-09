@@ -1,0 +1,26 @@
+# GLASTOR® UI Engine (`glastor-forge`) — Component Registry
+
+> Next-generation headless accessibility & zero-Node CSS bundling for Rust WASM.
+
+## Available Components
+
+- **`accordion`**: WCAG 2.2 Collapsible accordion with arrow keyboard navigation.
+  - Frameworks: leptos, dioxus, agnostic
+  - Dependencies: glastor-aria-core v0.1.0
+  - CLI Command: `cargo ui add accordion`
+
+- **`button`**: Accessible interactive button with focus ring, variants and loading states.
+  - Frameworks: leptos, dioxus, agnostic
+  - Dependencies: glastor-aria-core v0.1.0
+  - CLI Command: `cargo ui add button`
+
+- **`dialog`**: WAI-ARIA 1.2 modal dialog with automatic FocusTrap and DismissableLayer.
+  - Frameworks: leptos, dioxus, agnostic
+  - Dependencies: glastor-aria-core v0.1.0
+  - CLI Command: `cargo ui add dialog`
+
+## Core Features
+
+1. **Zero-Node CSS**: Powered by `glastor-css-binder`, compiles directly in `build.rs`.
+2. **WCAG 2.2 / WAI-ARIA 1.2**: Pure headless state machines in `glastor-aria-core`.
+3. **Surgical Injection**: `cargo ui add <component>` injects Rust source code directly.

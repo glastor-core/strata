@@ -1,0 +1,31 @@
+[package]
+name = "glastor-aria-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+readme = "README.md"
+description = "Headless WAI-ARIA 1.2 accessibility primitives and deterministic FSMs for Rust web frameworks."
+keywords = ["accessibility", "aria", "wcag", "headless", "leptos"]
+categories = ["gui", "web-programming", "wasm"]
+
+[lints]
+workspace = true
+
+[dependencies]
+thiserror = { workspace = true }
+bitflags = { workspace = true }
+serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+
+[features]
+default = ["std"]
+std = []
+serde = ["dep:serde", "dep:serde_json"]
+
+[dev-dependencies]
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }

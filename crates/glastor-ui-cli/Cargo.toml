@@ -1,0 +1,35 @@
+[package]
+name = "glastor-ui-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+readme = "README.md"
+description = "Decentralized UI distribution and code injection CLI for the Rust Cargo ecosystem."
+keywords = ["cli", "cargo", "components", "shadcn", "wasm"]
+categories = ["command-line-utilities", "development-tools"]
+
+[lints]
+workspace = true
+
+[lib]
+name = "glastor_ui_cli"
+path = "src/lib.rs"
+
+[[bin]]
+name = "cargo-ui"
+path = "src/main.rs"
+
+[dependencies]
+clap = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+glastor-aria-core = { workspace = true }
+glastor-css-binder = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3.17.1"

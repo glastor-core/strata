@@ -1,0 +1,55 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/glastor-aria-core",
+    "crates/glastor-css-binder",
+    "crates/glastor-ui-cli",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85.0"
+authors = ["GLASTOR® Core Engineering Team <engineering@glastor.io>"]
+license = "MIT OR Apache-2.0"
+homepage = "https://glastor.io"
+repository = "https://github.com/glastor-core/glastor-ui-engine"
+readme = "README.md"
+keywords = ["ui", "accessibility", "wasm", "leptos", "dioxus"]
+categories = ["gui", "web-programming", "wasm", "development-tools"]
+
+[workspace.dependencies]
+glastor-aria-core = { path = "crates/glastor-aria-core", version = "0.1.0" }
+glastor-css-binder = { path = "crates/glastor-css-binder", version = "0.1.0" }
+serde = { version = "1.0.218", features = ["derive"] }
+serde_json = "1.0.139"
+thiserror = "2.0.12"
+bitflags = "2.8.0"
+rayon = "1.10.0"
+regex = "1.11.1"
+clap = { version = "4.5.31", features = ["derive", "cargo", "env"] }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+missing_docs = "warn"
+rust_2024_compatibility = { level = "warn", priority = -1 }
+
+[workspace.lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+cargo = { level = "warn", priority = -1 }
+# Ergonomic, formatting & builder patterns
+module_name_repetitions = "allow"
+must_use_candidate = "allow"
+return_self_not_must_use = "allow"
+missing_const_for_fn = "allow"
+option_if_let_else = "allow"
+uninlined_format_args = "allow"
+format_push_string = "allow"
+too_many_lines = "allow"
+cast_precision_loss = "allow"
+multiple_crate_versions = "allow"
+cargo_common_metadata = "allow"
+doc_markdown = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"

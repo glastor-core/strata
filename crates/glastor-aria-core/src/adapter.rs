@@ -1,0 +1,95 @@
+//! Reactive adapter abstractions.
+//!
+//! Provides traits to connect headless state machines with modern reactive signal
+//! architectures (Leptos signals, Dioxus signals, Yew callbacks, or raw channels).
+
+use core::fmt::Debug;
+
+/// Abstraction for a reactive read-write signal or state cell.
+pub trait ReactiveState<T>: Clone {
+    /// Obtains a clone of the current state value.
+    fn get(&self) -> T;
+
+    /// Sets the state to a new value.
+    fn set(&self, value: T);
+
+    /// Updates the state in-place using a mutating closure.
+    fn update<F: FnOnce(&mut T)>(&self, f: F);
+}
+
+/// A sink that consumes actions produced by an FSM.
+pub trait ActionSink<A>: Clone {
+    /// Dispatches an action to the environment / DOM.
+    fn emit(&self, action: A);
+
+    /// Dispatches a batch of actions.
+    fn emit_all(&self, actions: Vec<A>) {
+        for action in actions {
+            self.emit(action);
+        }
+    }
+}
+
+/// Minimal in-memory reactive cell implementation suitable for `no_std` and unit tests.
+#[derive(Debug, Clone)]
+pub struct InMemoryCell<T> {
+    inner: std::sync::Arc<std::sync::Mutex<T>>,
+}
+
+impl<T> InMemoryCell<T> {
+    /// Creates a new in-memory reactive cell.
+    pub fn new(initial: T) -> Self {
+        Self {
+            inner: std::sync::Arc::new(std::sync::Mutex::new(initial)),
+        }
+    }
+}
+
+impl<T: Clone> ReactiveState<T> for InMemoryCell<T> {
+    fn get(&self) -> T {
+        self.inner.lock().expect("mutex poisoned").clone()
+    }
+
+    fn set(&self, value: T) {
+        *self.inner.lock().expect("mutex poisoned") = value;
+    }
+
+    fn update<F: FnOnce(&mut T)>(&self, f: F) {
+        let mut guard = self.inner.lock().expect("mutex poisoned");
+        f(&mut guard);
+    }
+}
+
+/// Action sink collecting emitted actions into a recorded buffer (useful for testing and auditing).
+#[derive(Debug, Clone, Default)]
+pub struct ActionRecorder<A> {
+    recorded: std::sync::Arc<std::sync::Mutex<Vec<A>>>,
+}
+
+impl<A> ActionRecorder<A> {
+    /// Creates a new action recorder.
+    pub fn new() -> Self {
+        Self {
+            recorded: std::sync::Arc::new(std::sync::Mutex::new(Vec::new())),
+        }
+    }
+
+    /// Returns all collected actions.
+    pub fn actions(&self) -> Vec<A>
+    where
+        A: Clone,
+    {
+        self.recorded.lock().expect("mutex poisoned").clone()
+    }
+
+    /// Clears the recorded action buffer.
+    pub fn clear(&self) {
+        self.recorded.lock().expect("mutex poisoned").clear();
+    }
+}
+
+impl<A: Clone + Debug> ActionSink<A> for ActionRecorder<A> {
+    fn emit(&self, action: A) {
+        self.recorded.lock().expect("mutex poisoned").push(action);
+    }
+}
