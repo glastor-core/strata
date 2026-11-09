@@ -58,6 +58,7 @@ pub enum DialogState {
 #[derive(Debug, Clone)]
 pub struct DialogFsm {
     dialog_id: String,
+    trigger_id: String,
     state: DialogState,
     is_modal: bool,
     is_alert: bool,
@@ -69,10 +70,12 @@ impl DialogFsm {
     /// Creates a new dialog FSM with a given identifier.
     pub fn new(dialog_id: impl Into<String>) -> Self {
         let id = dialog_id.into();
+        let trigger_id = format!("{id}-trigger");
         Self {
             focus_trap: FocusTrapFsm::new(id.clone()),
             dismissable: DismissableFsm::new(1),
             dialog_id: id,
+            trigger_id,
             state: DialogState::Closed,
             is_modal: true,
             is_alert: false,
@@ -132,7 +135,7 @@ impl StateMachine for DialogFsm {
         match (&self.state, &event) {
             (DialogState::Closed, DialogEvent::OpenTriggerClicked) => {
                 let trap_actions = self.focus_trap.transition(FocusTrapEvent::Activate {
-                    prior_focused_id: Some(format!("{}-trigger", self.dialog_id)),
+                    prior_focused_id: Some(self.trigger_id.clone()),
                     initial_focus_id: None,
                 });
                 let _ = self.dismissable.transition(DismissableEvent::Mount);

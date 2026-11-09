@@ -6,6 +6,8 @@ pub mod dismissable;
 pub mod focus_trap;
 pub mod popover;
 pub mod roving_tabindex;
+pub mod tabs;
+pub mod toast;
 
 pub use accordion::{
     AccordionAction, AccordionEvent, AccordionFsm, AccordionItemId, AccordionMode,
@@ -23,4 +25,10 @@ pub use popover::{PopoverAction, PopoverEvent, PopoverFsm, PopoverState, Popover
 pub use roving_tabindex::{
     RovingDirection, RovingItem, RovingTabindexAction, RovingTabindexEvent, RovingTabindexFsm,
     RovingTabindexState,
+};
+pub use tabs::{
+    TabId, TabItem, TabNavDirection, TabsAction, TabsActivationMode, TabsEvent, TabsFsm, TabsState,
+};
+pub use toast::{
+    ToastAction, ToastDescriptor, ToastEvent, ToastFsm, ToastId, ToastPriority, ToastState,
 };

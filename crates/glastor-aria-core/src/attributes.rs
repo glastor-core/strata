@@ -39,6 +39,10 @@ pub enum AriaRole {
     Toolbar,
     /// Tooltip overlay element.
     Tooltip,
+    /// Status live region notification.
+    Status,
+    /// Alert live region notification.
+    Alert,
 }
 
 impl AriaRole {
@@ -59,6 +63,8 @@ impl AriaRole {
             Self::TabPanel => "tabpanel",
             Self::Toolbar => "toolbar",
             Self::Tooltip => "tooltip",
+            Self::Status => "status",
+            Self::Alert => "alert",
         }
     }
 }
@@ -144,6 +150,14 @@ pub struct AriaAttributes {
     pub hidden: Option<bool>,
     /// aria-orientation
     pub orientation: Option<AriaOrientation>,
+    /// aria-selected ("true" | "false")
+    pub selected: Option<bool>,
+    /// aria-disabled boolean flag
+    pub disabled: Option<bool>,
+    /// aria-atomic boolean flag
+    pub atomic: Option<bool>,
+    /// aria-live ("polite" | "assertive" | "off")
+    pub live: Option<String>,
     /// tabindex attribute ("0" or "-1")
     pub tabindex: Option<i8>,
 }
@@ -163,6 +177,36 @@ impl AriaAttributes {
     /// Sets the `aria-expanded` attribute.
     pub fn with_expanded(mut self, expanded: bool) -> Self {
         self.expanded = Some(expanded);
+        self
+    }
+
+    /// Sets the `aria-selected` attribute.
+    pub fn with_selected(mut self, selected: bool) -> Self {
+        self.selected = Some(selected);
+        self
+    }
+
+    /// Sets the `aria-disabled` attribute.
+    pub fn with_disabled(mut self, disabled: bool) -> Self {
+        self.disabled = Some(disabled);
+        self
+    }
+
+    /// Sets the `aria-atomic` attribute.
+    pub fn with_atomic(mut self, atomic: bool) -> Self {
+        self.atomic = Some(atomic);
+        self
+    }
+
+    /// Sets the `aria-live` attribute.
+    pub fn with_live(mut self, live: impl Into<String>) -> Self {
+        self.live = Some(live.into());
+        self
+    }
+
+    /// Sets the `aria-orientation` attribute.
+    pub fn with_orientation(mut self, orientation: AriaOrientation) -> Self {
+        self.orientation = Some(orientation);
         self
     }
 
@@ -235,6 +279,18 @@ impl AriaAttributes {
         }
         if let Some(hidden) = self.hidden {
             pairs.push(("aria-hidden", hidden.to_string()));
+        }
+        if let Some(selected) = self.selected {
+            pairs.push(("aria-selected", selected.to_string()));
+        }
+        if let Some(disabled) = self.disabled {
+            pairs.push(("aria-disabled", disabled.to_string()));
+        }
+        if let Some(atomic) = self.atomic {
+            pairs.push(("aria-atomic", atomic.to_string()));
+        }
+        if let Some(ref live) = self.live {
+            pairs.push(("aria-live", live.clone()));
         }
         if let Some(orientation) = self.orientation {
             pairs.push(("aria-orientation", orientation.as_str().to_string()));

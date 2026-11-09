@@ -24,6 +24,16 @@
   - Dependencies: glastor-aria-core v0.1.0
   - CLI Command: `cargo ui add popover`
 
+- **`tabs`**: WAI-ARIA 1.2 Tabs list with roving arrow keyboard navigation and automatic/manual activation.
+  - Frameworks: leptos, dioxus, agnostic
+  - Dependencies: glastor-aria-core v0.1.0
+  - CLI Command: `cargo ui add tabs`
+
+- **`toast`**: WCAG 2.2 live region toast notifications with priority queue, pause-on-hover, and swipe dismissal.
+  - Frameworks: leptos, dioxus, agnostic
+  - Dependencies: glastor-aria-core v0.1.0
+  - CLI Command: `cargo ui add toast`
+
 ## Core Features
 
 1. **Zero-Node CSS**: Powered by `glastor-css-binder`, compiles directly in `build.rs`.

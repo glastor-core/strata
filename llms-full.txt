@@ -24,6 +24,16 @@
   - Dependencies: glastor-aria-core v0.1.0
   - CLI Command: `cargo ui add popover`
 
+- **`tabs`**: WAI-ARIA 1.2 Tabs list with roving arrow keyboard navigation and automatic/manual activation.
+  - Frameworks: leptos, dioxus, agnostic
+  - Dependencies: glastor-aria-core v0.1.0
+  - CLI Command: `cargo ui add tabs`
+
+- **`toast`**: WCAG 2.2 live region toast notifications with priority queue, pause-on-hover, and swipe dismissal.
+  - Frameworks: leptos, dioxus, agnostic
+  - Dependencies: glastor-aria-core v0.1.0
+  - CLI Command: `cargo ui add toast`
+
 ## Core Features
 
 1. **Zero-Node CSS**: Powered by `glastor-css-binder`, compiles directly in `build.rs`.
@@ -141,6 +151,51 @@ impl PopoverStyles {
     pub const TRIGGER: &'static str = "inline-flex items-center justify-center rounded-md font-medium px-4 py-2 hover:bg-muted";
     pub const CONTENT: &'static str = "z-50 bg-background text-foreground rounded-md border border-border p-4 shadow-md outline-none w-72";
     pub const TOOLTIP: &'static str = "z-50 bg-primary text-primary-foreground text-xs rounded px-2 py-1 shadow-sm";
+}
+
+```
+
+## Component: `tabs`
+
+> WAI-ARIA 1.2 Tabs list with roving arrow keyboard navigation and automatic/manual activation.
+
+### File: `tabs.rs`
+
+```rust
+//! Accessible Tabs Component.
+pub use glastor_aria_core::primitives::tabs::{
+    TabId, TabItem, TabNavDirection, TabsAction, TabsActivationMode, TabsEvent, TabsFsm, TabsState,
+};
+
+pub struct TabsStyles;
+
+impl TabsStyles {
+    pub const LIST: &'static str = "inline-flex items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground";
+    pub const TRIGGER: &'static str = "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50";
+    pub const PANEL: &'static str = "mt-2 focus-visible:outline-none focus-visible:ring-2";
+}
+
+```
+
+## Component: `toast`
+
+> WCAG 2.2 live region toast notifications with priority queue, pause-on-hover, and swipe dismissal.
+
+### File: `toast.rs`
+
+```rust
+//! Accessible Toast Component.
+pub use glastor_aria_core::primitives::toast::{
+    ToastAction, ToastDescriptor, ToastEvent, ToastFsm, ToastId, ToastPriority, ToastState,
+};
+
+pub struct ToastStyles;
+
+impl ToastStyles {
+    pub const VIEWPORT: &'static str = "fixed bottom-0 right-0 z-50 flex max-h-screen w-full flex-col-reverse p-4";
+    pub const TOAST: &'static str = "flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border border-border p-4 shadow-lg transition-all bg-background text-foreground";
+    pub const TITLE: &'static str = "text-sm font-semibold";
+    pub const DESCRIPTION: &'static str = "text-sm text-muted-foreground";
 }
 
 ```

@@ -175,6 +175,77 @@ impl PopoverStyles {
         },
     );
 
+    // 5. Tabs component
+    components.insert(
+        "tabs".to_string(),
+        RegistryComponent {
+            name: "tabs".to_string(),
+            description: "WAI-ARIA 1.2 Tabs list with roving arrow keyboard navigation and automatic/manual activation.".to_string(),
+            frameworks: vec!["leptos".to_string(), "dioxus".to_string(), "agnostic".to_string()],
+            dependencies: vec![
+                DependencyRequirement {
+                    name: "glastor-aria-core".to_string(),
+                    version: "0.1.0".to_string(),
+                    features: vec!["std".to_string()],
+                },
+            ],
+            files: vec![
+                ComponentFile {
+                    path: "tabs.rs".to_string(),
+                    content: r#"//! Accessible Tabs Component.
+pub use glastor_aria_core::primitives::tabs::{
+    TabId, TabItem, TabNavDirection, TabsAction, TabsActivationMode, TabsEvent, TabsFsm, TabsState,
+};
+
+pub struct TabsStyles;
+
+impl TabsStyles {
+    pub const LIST: &'static str = "inline-flex items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground";
+    pub const TRIGGER: &'static str = "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50";
+    pub const PANEL: &'static str = "mt-2 focus-visible:outline-none focus-visible:ring-2";
+}
+"#.to_string(),
+                },
+            ],
+        },
+    );
+
+    // 6. Toast Notification component
+    components.insert(
+        "toast".to_string(),
+        RegistryComponent {
+            name: "toast".to_string(),
+            description: "WCAG 2.2 live region toast notifications with priority queue, pause-on-hover, and swipe dismissal.".to_string(),
+            frameworks: vec!["leptos".to_string(), "dioxus".to_string(), "agnostic".to_string()],
+            dependencies: vec![
+                DependencyRequirement {
+                    name: "glastor-aria-core".to_string(),
+                    version: "0.1.0".to_string(),
+                    features: vec!["std".to_string()],
+                },
+            ],
+            files: vec![
+                ComponentFile {
+                    path: "toast.rs".to_string(),
+                    content: r#"//! Accessible Toast Component.
+pub use glastor_aria_core::primitives::toast::{
+    ToastAction, ToastDescriptor, ToastEvent, ToastFsm, ToastId, ToastPriority, ToastState,
+};
+
+pub struct ToastStyles;
+
+impl ToastStyles {
+    pub const VIEWPORT: &'static str = "fixed bottom-0 right-0 z-50 flex max-h-screen w-full flex-col-reverse p-4";
+    pub const TOAST: &'static str = "flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border border-border p-4 shadow-lg transition-all bg-background text-foreground";
+    pub const TITLE: &'static str = "text-sm font-semibold";
+    pub const DESCRIPTION: &'static str = "text-sm text-muted-foreground";
+}
+"#.to_string(),
+                },
+            ],
+        },
+    );
+
     RegistryManifest {
         version: "1.0.0".to_string(),
         name: "glastor-core-canonical".to_string(),

@@ -185,4 +185,75 @@ mod tests {
         assert!(kvs.contains(&("aria-controls", "dropdown-menu-1".to_string())));
         assert!(kvs.contains(&("tabindex", "0".to_string())));
     }
+
+    #[test]
+    fn test_tabs_lifecycle_and_keyboard_navigation() {
+        use crate::primitives::tabs::*;
+
+        let items = vec![
+            TabItem {
+                id: "tab-1".to_string(),
+                disabled: false,
+            },
+            TabItem {
+                id: "tab-2".to_string(),
+                disabled: true,
+            }, // disabled
+            TabItem {
+                id: "tab-3".to_string(),
+                disabled: false,
+            },
+        ];
+
+        let mut tabs = TabsFsm::new(items, AriaOrientation::Horizontal);
+        assert_eq!(tabs.selected_tab(), Some("tab-1"));
+
+        // Navigate Next -> should skip disabled tab-2 and activate tab-3
+        let actions = tabs.transition(TabsEvent::Navigate(TabNavDirection::Next));
+        assert_eq!(tabs.selected_tab(), Some("tab-3"));
+        assert!(actions.contains(&TabsAction::TabSelected("tab-3".to_string())));
+
+        // Verify ARIA attributes
+        let tab1_attrs = tabs.tab_aria_attributes("tab-1");
+        assert_eq!(tab1_attrs.selected, Some(false));
+        assert_eq!(tab1_attrs.tabindex, Some(-1));
+
+        let tab3_attrs = tabs.tab_aria_attributes("tab-3");
+        assert_eq!(tab3_attrs.selected, Some(true));
+        assert_eq!(tab3_attrs.tabindex, Some(0));
+    }
+
+    #[test]
+    fn test_toast_lifecycle_and_priority_queue() {
+        use crate::primitives::toast::*;
+
+        let mut toast_fsm = ToastFsm::new(3);
+        assert!(matches!(toast_fsm.state(), ToastState::Idle));
+
+        // Enqueue a normal toast
+        let toast1 = ToastDescriptor {
+            id: "msg-1".to_string(),
+            message: "Project saved".to_string(),
+            priority: ToastPriority::Normal,
+            duration_ms: 3000,
+        };
+        let actions = toast_fsm.transition(ToastEvent::Enqueue(toast1));
+        assert!(matches!(toast_fsm.state(), ToastState::Showing { .. }));
+        assert!(actions.contains(&ToastAction::ScheduleTimer(3000)));
+
+        // Hover pauses countdown
+        let pause_actions = toast_fsm.transition(ToastEvent::PointerEnter);
+        assert!(matches!(toast_fsm.state(), ToastState::Paused { .. }));
+        assert!(pause_actions.contains(&ToastAction::CancelTimer));
+
+        // Unhover resumes
+        let resume_actions = toast_fsm.transition(ToastEvent::PointerLeave);
+        assert!(matches!(toast_fsm.state(), ToastState::Showing { .. }));
+        assert!(resume_actions.contains(&ToastAction::ScheduleTimer(3000)));
+
+        // Timer tick expires toast
+        let expire_actions = toast_fsm.transition(ToastEvent::TimerTick(3000));
+        assert!(matches!(toast_fsm.state(), ToastState::Idle));
+        assert!(expire_actions.contains(&ToastAction::ToastDismissed("msg-1".to_string())));
+    }
 }

@@ -86,3 +86,58 @@ fn test_security_path_traversal_prevention() {
     let result_valid = ComponentInjector::validate_relative_path(valid);
     assert!(result_valid.is_ok());
 }
+
+#[test]
+fn test_accessibility_linter_diagnostics() {
+    use glastor_ui_cli::linter::{AccessibilityLinter, DiagnosticLevel};
+    use std::path::Path;
+
+    let linter = AccessibilityLinter::new();
+    let mut diags = Vec::new();
+
+    // Positive tabindex should trigger warning
+    let bad_tabindex = r#"<div tabindex="5">focus</div>"#;
+    linter.lint_file_content(Path::new("test.rsx"), bad_tabindex, &mut diags);
+    assert!(
+        diags
+            .iter()
+            .any(|d| d.rule_id == "WCAG-2.4.3" && d.level == DiagnosticLevel::Warning)
+    );
+
+    // Self-closing button without aria-label triggers error
+    let bad_btn = r#"<button class="p-2" />"#;
+    linter.lint_file_content(Path::new("test.rsx"), bad_btn, &mut diags);
+    assert!(
+        diags
+            .iter()
+            .any(|d| d.rule_id == "WCAG-4.1.2" && d.level == DiagnosticLevel::Error)
+    );
+
+    // Valid compliant button passes without error
+    let mut clean_diags = Vec::new();
+    let good_btn = r#"<button aria-label="Close modal">✕</button>"#;
+    linter.lint_file_content(Path::new("test.rsx"), good_btn, &mut clean_diags);
+    assert!(clean_diags.is_empty());
+}
+
+#[test]
+fn test_css_watcher_cycle() {
+    use glastor_ui_cli::watcher::CssWatcher;
+
+    let dir = tempdir().expect("tempdir");
+    let src_dir = dir.path().join("src");
+    let out_file = dir.path().join("dist").join("style.min.css");
+    fs::create_dir_all(&src_dir).expect("create src");
+
+    let component_file = src_dir.join("comp.rs");
+    fs::write(&component_file, r#"<div class="flex p-4"></div>"#).expect("write file");
+
+    let mut watcher = CssWatcher::new(&src_dir, &out_file);
+    let recompiled = watcher.check_and_recompile().expect("watcher check");
+    assert!(recompiled);
+    assert!(out_file.exists());
+
+    // Subsequent check without edits should not recompile
+    let recompiled_second = watcher.check_and_recompile().expect("watcher check 2");
+    assert!(!recompiled_second);
+}
