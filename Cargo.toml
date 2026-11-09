@@ -14,9 +14,9 @@ rust-version = "1.85.0"
 authors = ["GLASTOR® Core Engineering Team <engineering@glastor.io>"]
 license = "MIT OR Apache-2.0"
 homepage = "https://glastor.io"
-repository = "https://github.com/glastor-core/glastor-ui-engine"
+repository = "https://github.com/glastor-core/strata"
 readme = "README.md"
-keywords = ["ui", "accessibility", "wasm", "leptos", "dioxus"]
+keywords = ["ui", "accessibility", "wasm", "leptos", "dioxus", "strata"]
 categories = ["gui", "web-programming", "wasm", "development-tools"]
 
 [workspace.dependencies]

@@ -1,12 +1,14 @@
-# glastor-ui-engine (`glastor-forge`)
+# GLASTOR® Strata
 
-[![CI](https://github.com/glastor-core/glastor-ui-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/glastor-core/glastor-ui-engine/actions/workflows/ci.yml)
+[![CI](https://github.com/glastor-core/strata/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/glastor-core/strata/actions/workflows/ci.yml)
 [![Crates.io](https://img.shields.io/crates/v/glastor-aria-core.svg)](https://crates.io/crates/glastor-aria-core)
 [![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](LICENSE-MIT)
 [![Rust 2024](https://img.shields.io/badge/rust-2024%20edition-orange.svg)](https://www.rust-lang.org)
+[![Protected Branch](https://img.shields.io/badge/branch-main%20%5Bprotected%5D-success.svg)](.github/BRANCH_PROTECTION.md)
 
 > **Next-generation, zero-Node.js headless accessibility & style bundling engine for Rust web applications (Leptos, Dioxus, Yew).**
 
+Official Repository: [https://github.com/glastor-core/strata](https://github.com/glastor-core/strata)  
 Part of the **GLASTOR® Core** infrastructure suite.
 
 ---
@@ -14,9 +16,9 @@ Part of the **GLASTOR® Core** infrastructure suite.
 ## Architecture Overview
 
 ```
-glastor-ui-engine/
+strata/
 ├── crates/
-│   ├── glastor-aria-core     Headless WAI-ARIA 1.2 state machines (Dialog, Accordion, Popover, FocusTrap)
+│   ├── glastor-aria-core     Headless WAI-ARIA 1.2 state machines (Dialog, Accordion, Popover, FocusTrap, Motion, Grid)
 │   ├── glastor-css-binder    Zero-Node CSS scanning, compilation and bundling engine for build.rs and dev-watch
 │   └── glastor-ui-cli        Decentralized component distributor and AST patcher for Cargo (cargo ui)
 ├── examples/

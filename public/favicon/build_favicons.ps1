@@ -117,3 +117,4 @@ Add-Type -TypeDefinition $csharpSource -ReferencedAssemblies System.Drawing
 [GlastorIconGenerator]::GenerateIco("public\favicon\favicon-32x32.png", "public\favicon\favicon.ico")
 
 Write-Output "All PNG and ICO favicons generated cleanly!"
+

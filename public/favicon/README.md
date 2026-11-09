@@ -37,3 +37,4 @@ Para integrar esta suite en cualquier plantilla HTML (o en aplicaciones Leptos /
 <link rel="manifest" href="public/favicon/site.webmanifest">
 <meta name="theme-color" content="#09090b">
 ```
+
