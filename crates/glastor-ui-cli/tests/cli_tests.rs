@@ -8,6 +8,7 @@ use std::fs;
 use tempfile::tempdir;
 
 #[test]
+#[allow(clippy::assert_is_empty)]
 fn test_cli_add_component_and_mod_rs() {
     let dir = tempdir().expect("tempdir creation");
     let components_dir = dir.path().join("src").join("components").join("ui");
@@ -114,6 +115,7 @@ fn test_security_path_traversal_prevention() {
 }
 
 #[test]
+#[allow(clippy::assert_is_empty)]
 fn test_accessibility_linter_diagnostics() {
     use glastor_ui_cli::linter::{AccessibilityLinter, DiagnosticLevel};
     use std::path::Path;
