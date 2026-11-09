@@ -307,6 +307,150 @@
     </section>
   </main>
 
+  <!-- Global Footer -->
+  <footer class="max-w-6xl mx-auto border-t border-[#27272a] mt-20 pt-12 pb-16 space-y-10 text-xs">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+      
+      <!-- Col 1: Brand & Philosophy -->
+      <div class="space-y-4 md:col-span-1">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-white text-black flex items-center justify-center shadow-md">
+            <svg class="w-4 h-4 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+              <polyline points="2 17 12 22 22 17"/>
+              <polyline points="2 12 12 17 22 12"/>
+            </svg>
+          </div>
+          <span class="font-bold text-sm tracking-tight text-white">GLASTOR® Core</span>
+        </div>
+        <p class="text-[#a1a1aa] leading-relaxed">
+          Infraestructura web de componentes headless deterministas WAI-ARIA 1.2 y motor CSS atómico sin dependencias de Node.js o npm.
+        </p>
+        <div class="flex flex-wrap gap-1.5 pt-1">
+          <span class="px-2 py-0.5 rounded bg-[#18181b] border border-[#27272a] text-[10px] font-mono text-[#a1a1aa]">MIT / Apache 2.0</span>
+          <span class="px-2 py-0.5 rounded bg-[#18181b] border border-[#27272a] text-[10px] font-mono text-[#a1a1aa]">#forbid(unsafe_code)</span>
+          <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-mono">Rust 2024</span>
+        </div>
+      </div>
+
+      <!-- Col 2: Ecosistema Oficial -->
+      <div class="space-y-3">
+        <h4 class="font-semibold text-white tracking-wide uppercase text-[11px] text-zinc-400">Ecosistema Oficial</h4>
+        <ul class="space-y-2.5">
+          <li>
+            <a href="https://github.com/glastor-core/byte-gauge" target="_blank" rel="noopener noreferrer" class="group flex items-center justify-between text-[#a1a1aa] hover:text-white transition-colors">
+              <span class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                byte-gauge
+              </span>
+              <span class="text-[10px] text-zinc-600 font-mono group-hover:text-blue-400">SIMD/Wasm &rarr;</span>
+            </a>
+          </li>
+          <li>
+            <a href="https://github.com/glastor-core/specter" target="_blank" rel="noopener noreferrer" class="group flex items-center justify-between text-[#a1a1aa] hover:text-white transition-colors">
+              <span class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+                specter
+              </span>
+              <span class="text-[10px] text-zinc-600 font-mono group-hover:text-purple-400">AST Diff &rarr;</span>
+            </a>
+          </li>
+          <li>
+            <a href="https://github.com/glastor-core/zerho" target="_blank" rel="noopener noreferrer" class="group flex items-center justify-between text-[#a1a1aa] hover:text-white transition-colors">
+              <span class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                zerho
+              </span>
+              <span class="text-[10px] text-zinc-600 font-mono group-hover:text-emerald-400">Edge &lt;15ms &rarr;</span>
+            </a>
+          </li>
+          <li>
+            <a href="#tab-css" onclick="switchTab('css')" class="group flex items-center justify-between text-[#a1a1aa] hover:text-white transition-colors">
+              <span class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-yellow-400"></span>
+                glastor-css-binder
+              </span>
+              <span class="text-[10px] text-zinc-600 font-mono group-hover:text-yellow-400">Zero-Node &rarr;</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Primitivas & Crates -->
+      <div class="space-y-3">
+        <h4 class="font-semibold text-white tracking-wide uppercase text-[11px] text-zinc-400">Crates &amp; FSMs</h4>
+        <ul class="space-y-2 text-[#a1a1aa]">
+          <li class="flex items-center justify-between">
+            <span class="hover:text-white transition-colors">glastor-aria-core</span>
+            <span class="font-mono text-[10px] text-zinc-500">v0.1.0</span>
+          </li>
+          <li class="flex items-center justify-between">
+            <span class="hover:text-white transition-colors">glastor-ui-cli (cargo-ui)</span>
+            <span class="font-mono text-[10px] text-zinc-500">v0.1.0</span>
+          </li>
+          <li class="flex items-center justify-between">
+            <span class="hover:text-white transition-colors">DialogFsm &amp; FocusTrap</span>
+            <span class="font-mono text-[10px] text-emerald-400/80">WCAG 2.2</span>
+          </li>
+          <li class="flex items-center justify-between">
+            <span class="hover:text-white transition-colors">TabsFsm &amp; ToastFsm</span>
+            <span class="font-mono text-[10px] text-emerald-400/80">WAI-ARIA 1.2</span>
+          </li>
+          <li class="flex items-center justify-between">
+            <span class="hover:text-white transition-colors">CssWatcher Daemon</span>
+            <span class="font-mono text-[10px] text-zinc-500">&lt; 35ms</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Col 4: Recursos & AI Index -->
+      <div class="space-y-3">
+        <h4 class="font-semibold text-white tracking-wide uppercase text-[11px] text-zinc-400">Recursos &amp; Docs</h4>
+        <ul class="space-y-2.5">
+          <li>
+            <a href="llms.txt" target="_blank" class="flex items-center justify-between text-[#a1a1aa] hover:text-white transition-colors">
+              <span>Índice AI (llms.txt)</span>
+              <span class="px-1.5 py-0.5 rounded bg-[#18181b] border border-[#27272a] text-[10px] font-mono text-zinc-400">AI-Ready</span>
+            </a>
+          </li>
+          <li>
+            <a href="llms-full.txt" target="_blank" class="flex items-center justify-between text-[#a1a1aa] hover:text-white transition-colors">
+              <span>Especificación Completa</span>
+              <span class="text-[10px] text-zinc-500 font-mono">llms-full.txt</span>
+            </a>
+          </li>
+          <li>
+            <a href="public/favicon/site.webmanifest" target="_blank" class="flex items-center justify-between text-[#a1a1aa] hover:text-white transition-colors">
+              <span>Manifiesto PWA</span>
+              <span class="text-[10px] text-zinc-500 font-mono">webmanifest</span>
+            </a>
+          </li>
+          <li>
+            <a href="schemas/registry-v1.json" target="_blank" class="flex items-center justify-between text-[#a1a1aa] hover:text-white transition-colors">
+              <span>Schema JSON del Registry</span>
+              <span class="text-[10px] text-zinc-500 font-mono">JSONSchema</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Bottom sub-footer bar -->
+    <div class="border-t border-[#27272a] pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-[#71717a]">
+      <div class="flex items-center space-x-2">
+        <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+        <span>&copy; 2026 GLASTOR® Core Organization. Código bajo doble licencia MIT y Apache-2.0.</span>
+      </div>
+      <div class="flex items-center space-x-6">
+        <span class="font-mono text-[11px] text-zinc-500">Pipeline: 22/22 Passing · Zero-Node Verified</span>
+        <a href="#" class="text-[#a1a1aa] hover:text-white transition-colors flex items-center gap-1 font-medium">
+          Volver arriba &uarr;
+        </a>
+      </div>
+    </div>
+  </footer>
+
   <!-- Interactive Modal / Dialog Component Overlay (ARIA Compliant) -->
   <div id="modal-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
     <!-- Start Sentinel -->
