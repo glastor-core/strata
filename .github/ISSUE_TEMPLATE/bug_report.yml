@@ -1,53 +1,49 @@
 name: "🐛 Reporte de Bug"
-description: "Reporta un problema técnico, error de compilación o fallo en el playground de Zerho"
+description: "Reporta un problema técnico, error de compilación o anomalía en GLASTOR® Strata"
 title: "[Bug]: "
 labels: ["bug"]
 body:
   - type: markdown
     attributes:
       value: |
-        Gracias por tomarte el tiempo de reportar este problema en **Zerho**.
-        Proporcionar detalles específicos sobre el entorno y la página afectada agiliza enormemente la resolución.
+        Gracias por tomarte el tiempo de reportar este problema en **GLASTOR® Strata**.
+        Proporcionar detalles específicos sobre el crate afectado, el framework WASM y el entorno de Cargo agiliza la resolución.
 
   - type: textarea
     id: summary
     attributes:
       label: "Descripción del fallo"
       description: "Explica de forma concisa qué falló o qué comportamiento anómalo se presentó."
-      placeholder: "Ejemplo: El bloque de código runnable no captura la salida de la consola en..."
+      placeholder: "Ejemplo: DialogFsm no restaura el foco previo al presionar Escape en Safari..."
     validations:
       required: true
 
   - type: dropdown
-    id: module
+    id: crate_module
     attributes:
-      label: "Módulo afectado"
-      description: "¿Qué componente de Zerho presentó el problema?"
+      label: "Crate o Submódulo Afectado"
+      description: "¿Qué componente de Strata presentó el problema?"
       options:
-        - "Compilador Markdown (Callouts, Tabs, Mermaid)"
-        - "Playground Interactivo (Monaco Editor & Sandbox)"
-        - "Explorador OpenAPI 3.1 (Try It Out & Snippets)"
-        - "Buscador Spotlight (Cmd+K) & Asistente IA RAG"
-        - "Servidor Edge (Deno Deploy & Deno KV feedback)"
-        - "Constructor SSG (builder.ts)"
-        - "Servidor de Desarrollo Local (dev.ts / HMR)"
-        - "CLI Universal (zerho)"
-        - "Cloudflare Pages (zerho.xyz)"
+        - "glastor-aria-core (Primitivas FSM, FocusTrap, Dismissable, Grid, Motion)"
+        - "glastor-css-binder (Scanner Rayon, Zero-Node build.rs, Reglas CSS, Minificador)"
+        - "glastor-ui-cli (cargo ui add, sync-tokens, lint-a11y, watch, audit)"
+        - "Multi-Framework Codegen (Leptos, Dioxus, Yew)"
+        - "Ecosistema GLASTOR Core (byte-gauge, specter, zerho docs)"
         - "Otro / General"
     validations:
       required: true
 
   - type: dropdown
-    id: runtime_mode
+    id: framework
     attributes:
-      label: "Modo de Ejecución"
-      description: "¿Cómo estás ejecutando Zerho?"
+      label: "Framework Web Rust WASM"
+      description: "¿Qué framework o runtime estás usando?"
       options:
-        - "Deno Dev Server (deno task dev)"
-        - "Compilador SSG (deno task build)"
-        - "Servidor Deno Deploy (deno task serve / main.ts)"
-        - "Cloudflare Pages (producción en zerho.xyz)"
-        - "CLI Universal (src/cli.ts / bin/zerho)"
+        - "Leptos (v0.6 / v0.7+)"
+        - "Dioxus (v0.5 / v0.6+)"
+        - "Yew (v0.21+)"
+        - "Vanilla Rust WASM (web-sys / wasm-bindgen)"
+        - "CLI en Cargo nativo"
     validations:
       required: true
 
@@ -57,8 +53,8 @@ body:
       label: "Pasos para reproducir"
       description: "Secuencia determinista de pasos para replicar el problema."
       placeholder: |
-        1. Agregar archivo docs/mi-doc.md con...
-        2. Ejecutar `deno task build`
+        1. Configurar build.rs con BuildBinder::new().scan_dir("src")...
+        2. Ejecutar `cargo build`
         3. Observar el error en...
     validations:
       required: true
@@ -66,18 +62,20 @@ body:
   - type: textarea
     id: environment
     attributes:
-      label: "Entorno"
-      description: "Indica versión de Deno, OS y navegador si aplica."
+      label: "Entorno Técnico"
+      description: "Versión de Rust, OS y herramientas."
       placeholder: |
-        - Deno: 2.x
-        - OS: Windows 11 / Ubuntu / macOS
-        - Navegador: Chrome 124 / Firefox / Safari
+        - Rust: 1.85.0 (Edition 2024)
+        - Target: wasm32-unknown-unknown / x86_64
+        - OS: Windows 11 / Ubuntu 24.04 / macOS Sequoia
     validations:
       required: true
 
   - type: textarea
     id: logs
     attributes:
-      label: "Logs o Capturas de Pantalla"
-      description: "Pega la traza de error de la terminal o consola del navegador."
+      label: "Salida de Compilación o Logs de Error"
+      description: "Pega la salida relevante de `cargo test`, `cargo build` o consola del navegador."
       render: shell
+    validations:
+      required: false

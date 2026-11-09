@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
   publish-crates:
     name: Publish to Crates.io
@@ -16,6 +19,9 @@ jobs:
         run: cargo publish -p glastor-aria-core --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
       - name: Publish glastor-css-binder
         run: cargo publish -p glastor-css-binder --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
+      - name: Wait for crates.io index propagation
+        run: sleep 30
       - name: Publish glastor-ui-cli
         run: cargo publish -p glastor-ui-cli --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
 
