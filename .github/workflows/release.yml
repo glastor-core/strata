@@ -15,6 +15,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+      - name: Validate CARGO_REGISTRY_TOKEN secret
+        env:
+          TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::error::Falta configurar el secret CARGO_REGISTRY_TOKEN en GitHub Settings -> Secrets and variables -> Actions."
+            exit 1
+          fi
       - name: Publish glastor-aria-core
         run: cargo publish -p glastor-aria-core --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
       - name: Publish glastor-css-binder

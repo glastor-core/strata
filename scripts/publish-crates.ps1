@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Script de publicación ordenada para el workspace GLASTOR® Strata en crates.io.
 
@@ -31,10 +31,23 @@ $extraArgs = @()
 if ($DryRun) {
     Write-Host "[MODO] Dry-Run activo (simulación sin publicación real)" -ForegroundColor Yellow
     $extraArgs += "--dry-run"
-}
-if ($Token) {
+} elseif ($Token) {
     $extraArgs += "--token"
-    $extraArgs += $Token
+    $extraArgs += $Token.Trim()
+} else {
+    $hasCredentials = (Test-Path "$env:USERPROFILE\.cargo\credentials.toml") -or (Test-Path "$env:USERPROFILE\.cargo\credentials")
+    if (-not $hasCredentials) {
+        Write-Host "`n[Aviso] No se detectaron credenciales guardadas en ~/.cargo/credentials.toml." -ForegroundColor Yellow
+        Write-Host "Puedes generar tu token en: https://crates.io/settings/tokens" -ForegroundColor Cyan
+        $inputToken = Read-Host "`nPor favor ingresa tu Token de API de crates.io (comienza con cio...)"
+        if ([string]::IsNullOrWhiteSpace($inputToken)) {
+            Write-Host "Operación cancelada. Ejecuta: .\scripts\publish-crates.ps1 -Token 'TU_TOKEN'" -ForegroundColor Red
+            exit 1
+        }
+        $Token = $inputToken.Trim()
+        $extraArgs += "--token"
+        $extraArgs += $Token
+    }
 }
 
 # 1. Pre-flight checks
