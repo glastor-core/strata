@@ -38,6 +38,10 @@ pub enum DialogAction {
     FocusFirstElement,
     /// Focus boundary wrap to last element.
     FocusLastElement,
+    /// Lock body scroll to prevent elastic background movement (mobile Safari/iOS).
+    LockBodyScroll,
+    /// Unlock body scroll when dialog is dismissed.
+    UnlockBodyScroll,
 }
 
 /// State of the dialog.
@@ -134,7 +138,7 @@ impl StateMachine for DialogFsm {
                 let _ = self.dismissable.transition(DismissableEvent::Mount);
                 self.state = DialogState::Open;
 
-                let mut actions = vec![DialogAction::TrapFocus];
+                let mut actions = vec![DialogAction::TrapFocus, DialogAction::LockBodyScroll];
                 if trap_actions.contains(&FocusTrapAction::FocusFirstNode) {
                     actions.push(DialogAction::FocusFirstElement);
                 }
@@ -147,7 +151,10 @@ impl StateMachine for DialogFsm {
                     .dismissable
                     .transition(DismissableEvent::DismissRequested);
                 self.state = DialogState::Closed;
-                vec![DialogAction::RestorePriorFocus]
+                vec![
+                    DialogAction::RestorePriorFocus,
+                    DialogAction::UnlockBodyScroll,
+                ]
             }
 
             (DialogState::Open, DialogEvent::EscapePressed) => {
@@ -158,6 +165,7 @@ impl StateMachine for DialogFsm {
                     vec![
                         DialogAction::PreventDefault,
                         DialogAction::RestorePriorFocus,
+                        DialogAction::UnlockBodyScroll,
                     ]
                 } else {
                     Vec::new()
@@ -173,7 +181,10 @@ impl StateMachine for DialogFsm {
                 if dismiss_actions.contains(&DismissableAction::DismissSelf) {
                     let _ = self.focus_trap.transition(FocusTrapEvent::Deactivate);
                     self.state = DialogState::Closed;
-                    vec![DialogAction::RestorePriorFocus]
+                    vec![
+                        DialogAction::RestorePriorFocus,
+                        DialogAction::UnlockBodyScroll,
+                    ]
                 } else {
                     Vec::new()
                 }

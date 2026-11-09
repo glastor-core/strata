@@ -69,6 +69,7 @@ mod tests {
         assert_eq!(dialog.state(), &DialogState::Open);
         assert!(actions.contains(&DialogAction::TrapFocus));
         assert!(actions.contains(&DialogAction::FocusFirstElement));
+        assert!(actions.contains(&DialogAction::LockBodyScroll));
 
         // ARIA attributes check
         let trigger_attrs = dialog.trigger_aria_attributes();
@@ -79,11 +80,12 @@ mod tests {
         assert_eq!(container_attrs.role, Some(AriaRole::Dialog));
         assert_eq!(container_attrs.modal, Some(true));
 
-        // Press Escape -> Closes and restores focus
+        // Press Escape -> Closes, restores focus and unlocks scroll
         let actions = dialog.transition(DialogEvent::EscapePressed);
         assert_eq!(dialog.state(), &DialogState::Closed);
         assert!(actions.contains(&DialogAction::RestorePriorFocus));
         assert!(actions.contains(&DialogAction::PreventDefault));
+        assert!(actions.contains(&DialogAction::UnlockBodyScroll));
     }
 
     #[test]

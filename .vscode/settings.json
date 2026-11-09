@@ -1,0 +1,22 @@
+{
+  "rust-analyzer.cargo.allFeatures": true,
+  "rust-analyzer.check.command": "clippy",
+  "rust-analyzer.cargo.target": "wasm32-unknown-unknown",
+  "tailwindCSS.includeLanguages": {
+    "rust": "html"
+  },
+  "tailwindCSS.experimental.classRegex": [
+    ["(?:class|className|classes!)\\s*(?:=|:|\\()\\s*[\"']([^\"']*)[\"']", "([^\"'\\s]+)"],
+    ["view!\\s*\\{[\\s\\S]*?class\\s*=\\s*\"([^\"]*)\"", "([^\"]+)"],
+    ["rsx!\\s*\\{[\\s\\S]*?class\\s*:\\s*\"([^\"]*)\"", "([^\"]+)"]
+  ],
+  "json.schemas": [
+    {
+      "fileMatch": ["registry.json"],
+      "url": "./schemas/registry-v1.json"
+    }
+  ],
+  "files.associations": {
+    "glastor-ui.toml": "toml"
+  }
+}

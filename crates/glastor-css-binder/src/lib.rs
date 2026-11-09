@@ -50,6 +50,26 @@ mod tests {
     }
 
     #[test]
+    fn test_security_css_injection_sanitization() {
+        // Legitimate arbitrary values pass
+        let valid = "w-[300px]".to_string();
+        let engine = RulesEngine::new();
+        let css = engine.compile_stylesheet(&[valid]);
+        assert!(css.contains(r".w-\[300px\] { width: 300px; }"));
+
+        // Malicious arbitrary values containing rule breaks or urls are discarded
+        let malicious_break = "w-[100px;background:red]".to_string();
+        let malicious_url = "bg-[url('https://evil.com/leak')]".to_string();
+        let malicious_expr = "w-[expression(alert(1))]".to_string();
+
+        let malicious_css =
+            engine.compile_stylesheet(&[malicious_break, malicious_url, malicious_expr]);
+        assert!(!malicious_css.contains("background:red"));
+        assert!(!malicious_css.contains("evil.com"));
+        assert!(!malicious_css.contains("expression"));
+    }
+
+    #[test]
     fn test_rules_engine_standard_and_arbitrary() {
         let classes = vec![
             "flex".to_string(),

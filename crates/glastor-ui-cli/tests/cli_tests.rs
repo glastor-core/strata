@@ -59,3 +59,25 @@ fn test_cli_llms_doc_generation() {
     assert!(doc.contains("`cargo ui add dialog`"));
     assert!(doc.contains("`cargo ui add accordion`"));
 }
+
+#[test]
+fn test_security_path_traversal_prevention() {
+    // Attempt relative traversal escape
+    let malicious = "../../../etc/passwd";
+    let result = ComponentInjector::validate_relative_path(malicious);
+    assert!(result.is_err());
+
+    // Attempt absolute path escape
+    let malicious_abs = if cfg!(windows) {
+        "C:\\malicious.rs"
+    } else {
+        "/tmp/malicious.rs"
+    };
+    let result_abs = ComponentInjector::validate_relative_path(malicious_abs);
+    assert!(result_abs.is_err());
+
+    // Valid path passes
+    let valid = "subfolder/button.rs";
+    let result_valid = ComponentInjector::validate_relative_path(valid);
+    assert!(result_valid.is_ok());
+}

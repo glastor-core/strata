@@ -21,6 +21,7 @@ impl ComponentInjector {
         let mut module_names = Vec::new();
 
         for file in &component.files {
+            Self::validate_relative_path(&file.path)?;
             let file_path = target_dir.join(&file.path);
             if let Some(parent) = file_path.parent() {
                 fs::create_dir_all(parent)?;
@@ -41,6 +42,32 @@ impl ComponentInjector {
         Self::verify_cargo_dependencies(component, Path::new("Cargo.toml"))?;
 
         Ok(installed_files)
+    }
+
+    /// Validates that a file path is strictly relative and contains no parent ('..') or root components.
+    pub fn validate_relative_path(path_str: &str) -> Result<(), Box<dyn std::error::Error>> {
+        let path = Path::new(path_str);
+        if path.is_absolute() {
+            return Err(format!("Security error: Absolute path '{path_str}' is forbidden").into());
+        }
+        for component in path.components() {
+            match component {
+                std::path::Component::ParentDir => {
+                    return Err(format!(
+                        "Security error: Path traversal detected ('..') in component path '{path_str}'"
+                    )
+                    .into());
+                }
+                std::path::Component::RootDir | std::path::Component::Prefix(_) => {
+                    return Err(format!(
+                        "Security error: Root or prefix component forbidden in path '{path_str}'"
+                    )
+                    .into());
+                }
+                _ => {}
+            }
+        }
+        Ok(())
     }
 
     /// Automatically registers newly installed components inside mod.rs.
@@ -94,4 +121,3 @@ impl ComponentInjector {
         Ok(())
     }
 }
-

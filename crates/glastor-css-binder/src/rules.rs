@@ -322,6 +322,21 @@ impl RulesEngine {
             if class.ends_with(']') {
                 let prefix = &class[..open];
                 let arbitrary = &class[open + 2..class.len() - 1];
+
+                // AppSec Sanitization: Reject rule termination and dangerous CSS injection vectors
+                let lower = arbitrary.to_ascii_lowercase();
+                if arbitrary.contains(';')
+                    || arbitrary.contains('{')
+                    || arbitrary.contains('}')
+                    || arbitrary.contains('\\')
+                    || arbitrary.contains('@')
+                    || lower.contains("url(")
+                    || lower.contains("expression(")
+                    || lower.contains("javascript:")
+                {
+                    return None;
+                }
+
                 return Some((prefix, arbitrary));
             }
         }
