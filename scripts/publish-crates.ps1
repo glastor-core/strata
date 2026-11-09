@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
   Script de publicación ordenada para el workspace GLASTOR® Strata en crates.io.
 
@@ -78,3 +78,4 @@ Write-Host "  https://crates.io/crates/glastor-aria-core" -ForegroundColor Cyan
 Write-Host "  https://crates.io/crates/glastor-css-binder" -ForegroundColor Cyan
 Write-Host "  https://crates.io/crates/glastor-ui-cli" -ForegroundColor Cyan
 Write-Host "========================================================" -ForegroundColor Green
+

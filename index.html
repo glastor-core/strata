@@ -236,7 +236,198 @@
         </div>
       </div>
 
-      <!-- Tab 2: Zero-Node CSS Compiler Simulation -->
+      <!-- Tab 2: Spring Physics Motion Engine -->
+      <div id="content-spring" class="space-y-6 hidden">
+        <div class="flex items-center justify-between">
+          <p class="text-xs text-[#a1a1aa]">
+            Motor de animación física basado en el <strong>oscilador armónico amortiguado</strong>. Genera <code class="font-mono">@keyframes</code> atómicos sin JavaScript en tiempo de ejecución.
+          </p>
+          <div class="flex items-center gap-1.5 text-xs font-mono">
+            <span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">f32 SIMD Physics</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Physics Controls -->
+          <div class="border border-[#27272a] rounded-xl p-5 bg-[#09090b] space-y-4">
+            <div class="flex items-center justify-between">
+              <h4 class="font-semibold text-sm flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                Parámetros del Resorte (Harmonic Oscillator)
+              </h4>
+              <div class="flex gap-1 text-[11px]">
+                <button onclick="setSpringPreset('bouncy')" class="px-2 py-0.5 rounded bg-[#18181b] border border-[#27272a] text-[#a1a1aa] hover:text-white transition-all">Bouncy</button>
+                <button onclick="setSpringPreset('smooth')" class="px-2 py-0.5 rounded bg-[#18181b] border border-[#27272a] text-[#a1a1aa] hover:text-white transition-all">Smooth</button>
+                <button onclick="setSpringPreset('snappy')" class="px-2 py-0.5 rounded bg-[#18181b] border border-[#27272a] text-[#a1a1aa] hover:text-white transition-all">Snappy</button>
+              </div>
+            </div>
+
+            <div class="space-y-3 text-xs">
+              <div>
+                <div class="flex justify-between text-[#a1a1aa] mb-1 font-mono">
+                  <span>Rigidez (Stiffness, k):</span>
+                  <span id="stiffness-val" class="text-white font-semibold">180</span>
+                </div>
+                <input id="slider-stiffness" type="range" min="50" max="450" value="180" oninput="updateSpringSimulation()" class="w-full accent-cyan-400 bg-[#18181b] h-1.5 rounded-lg cursor-pointer">
+              </div>
+
+              <div>
+                <div class="flex justify-between text-[#a1a1aa] mb-1 font-mono">
+                  <span>Amortiguamiento (Damping, c):</span>
+                  <span id="damping-val" class="text-white font-semibold">12</span>
+                </div>
+                <input id="slider-damping" type="range" min="4" max="45" value="12" oninput="updateSpringSimulation()" class="w-full accent-cyan-400 bg-[#18181b] h-1.5 rounded-lg cursor-pointer">
+              </div>
+
+              <div>
+                <div class="flex justify-between text-[#a1a1aa] mb-1 font-mono">
+                  <span>Masa Inercial (Mass, m):</span>
+                  <span id="mass-val" class="text-white font-semibold">1.0</span>
+                </div>
+                <input id="slider-mass" type="range" min="0.5" max="3.0" step="0.1" value="1.0" oninput="updateSpringSimulation()" class="w-full accent-cyan-400 bg-[#18181b] h-1.5 rounded-lg cursor-pointer">
+              </div>
+            </div>
+
+            <div class="bg-[#18181b] border border-[#27272a] rounded-lg p-3 font-mono text-[11px] text-[#a1a1aa] space-y-1">
+              <div class="flex justify-between">
+                <span>Razón de amortiguamiento (&zeta;):</span>
+                <span id="zeta-val" class="text-emerald-400 font-bold">0.447 (Subamortiguado)</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Frecuencia natural (&omega;<sub>n</sub>):</span>
+                <span id="omega-val" class="text-cyan-400 font-medium">13.42 rad/s</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Interactive Preview & Keyframes -->
+          <div class="border border-[#27272a] rounded-xl p-5 bg-[#09090b] space-y-4 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between pb-2 mb-3 border-b border-[#27272a]">
+                <h4 class="font-semibold text-sm text-white">Visualización en Vivo del Resorte</h4>
+                <button onclick="triggerSpringPreview()" class="px-3 py-1 rounded bg-white text-black text-xs font-semibold hover:opacity-90 flex items-center gap-1 transition-all">
+                  ▶ Re-animar
+                </button>
+              </div>
+
+              <div class="h-28 bg-[#18181b] border border-[#27272a] rounded-xl flex items-center justify-center overflow-hidden relative">
+                <div id="spring-target-box" class="w-48 py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-400/40 text-center text-xs font-mono text-cyan-300 shadow-lg shadow-cyan-500/10 cursor-pointer select-none" onclick="triggerSpringPreview()">
+                  <div class="font-bold text-white text-sm">GLASTOR® Spring</div>
+                  <div class="text-[10px] text-cyan-400">Clic para rebotar</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <label class="text-[11px] font-semibold uppercase tracking-wider text-[#a1a1aa]">CSS @keyframes Compilado (Zero-Node)</label>
+              <pre id="spring-keyframes-output" class="w-full bg-[#18181b] border border-[#27272a] rounded-lg p-2.5 font-mono text-[11px] text-cyan-300 overflow-x-auto h-24"></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Virtualized 2D Grid FSM -->
+      <div id="content-grid" class="space-y-6 hidden">
+        <div class="flex items-center justify-between">
+          <p class="text-xs text-[#a1a1aa]">
+            Matriz virtualizada 2D de alto rendimiento (<code class="font-mono">GridFsm</code>). Administra <strong>roving tabindex bidireccional</strong> y cálculo de ventana visible sin renderizar miles de nodos DOM inútiles.
+          </p>
+          <span class="px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 text-xs font-mono">WAI-ARIA 1.2 Grid</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Live 2D Grid Table -->
+          <div class="md:col-span-2 border border-[#27272a] rounded-xl p-5 bg-[#09090b] space-y-4">
+            <div class="flex items-center justify-between">
+              <h4 class="font-semibold text-sm flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                Matriz Interactiva (Navega con Flechas del Teclado)
+              </h4>
+              <span class="text-[11px] text-[#a1a1aa] font-mono">32 celdas virtuales (8 &times; 4)</span>
+            </div>
+
+            <div role="grid" aria-label="Tabla de datos virtualizada" id="virtual-grid-container" tabindex="0" onkeydown="handleGridKeydown(event)" class="grid grid-cols-4 gap-2 bg-[#18181b] p-3 rounded-xl border border-[#27272a] focus:outline-none focus:ring-1 focus:ring-purple-500 cursor-pointer">
+              <!-- Dynamically populated 8x4 matrix -->
+            </div>
+
+            <p class="text-[11px] text-[#a1a1aa]">
+              Controles: Haz clic en la tabla y usa <kbd class="px-1 py-0.5 bg-[#18181b] border border-[#27272a] rounded text-[10px]">&uarr;</kbd> <kbd class="px-1 py-0.5 bg-[#18181b] border border-[#27272a] rounded text-[10px]">&darr;</kbd> <kbd class="px-1 py-0.5 bg-[#18181b] border border-[#27272a] rounded text-[10px]">&larr;</kbd> <kbd class="px-1 py-0.5 bg-[#18181b] border border-[#27272a] rounded text-[10px]">&rarr;</kbd> para moverte entre celdas; <kbd class="px-1 py-0.5 bg-[#18181b] border border-[#27272a] rounded text-[10px]">Home</kbd> / <kbd class="px-1 py-0.5 bg-[#18181b] border border-[#27272a] rounded text-[10px]">End</kbd> para extremos de fila.
+            </p>
+          </div>
+
+          <!-- Telemetry & Slice Calculation -->
+          <div class="border border-[#27272a] rounded-xl p-5 bg-[#09090b] space-y-4">
+            <h4 class="font-semibold text-sm text-white">Telemetría GridFsm</h4>
+
+            <div class="space-y-3 font-mono text-xs">
+              <div class="bg-[#18181b] border border-[#27272a] rounded-lg p-3 space-y-1.5">
+                <div class="text-[#a1a1aa] text-[11px]">Coordenada Activa:</div>
+                <div id="grid-active-coord" class="text-white text-base font-bold text-purple-400">Fila 0, Col 0</div>
+              </div>
+
+              <div class="bg-[#18181b] border border-[#27272a] rounded-lg p-3 space-y-1.5">
+                <div class="text-[#a1a1aa] text-[11px]">Ventana Virtual Calculada:</div>
+                <div id="grid-visible-slice" class="text-emerald-400 font-semibold">Filas 0..3 (4 visibles)</div>
+                <div class="text-[10px] text-zinc-500">VirtualSlice::compute(offset, 40px, 160px)</div>
+              </div>
+
+              <div class="bg-[#18181b] border border-[#27272a] rounded-lg p-3 space-y-1.5">
+                <div class="text-[#a1a1aa] text-[11px]">Latencia de Transición FSM:</div>
+                <div class="text-cyan-400 font-semibold">&lt; 180 ns</div>
+                <div class="text-[10px] text-zinc-500">Zero-alloc bitflags state</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 4: Multi-Framework Code Generator -->
+      <div id="content-codegen" class="space-y-6 hidden">
+        <div class="flex items-center justify-between">
+          <p class="text-xs text-[#a1a1aa]">
+            Generador de componentes nativos para frameworks web de Rust. Inyecta primitivas ARIA estrictas y utilidades CSS deterministas con <code class="font-mono">cargo ui add</code>.
+          </p>
+          <div class="flex items-center gap-1.5 text-xs font-mono">
+            <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Zero Node.js</span>
+          </div>
+        </div>
+
+        <div class="border border-[#27272a] rounded-xl p-5 bg-[#09090b] space-y-4">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-[#27272a] pb-4">
+            <!-- Framework Selector -->
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-[#a1a1aa]">Framework:</span>
+              <div class="flex space-x-1 bg-[#18181b] p-1 rounded-lg border border-[#27272a]">
+                <button id="cg-fw-leptos" onclick="selectCodegenFramework('leptos')" class="px-3 py-1 rounded-md text-xs font-medium bg-[#27272a] text-white transition-all">Leptos (RSX)</button>
+                <button id="cg-fw-dioxus" onclick="selectCodegenFramework('dioxus')" class="px-3 py-1 rounded-md text-xs font-medium text-[#a1a1aa] hover:text-white transition-all">Dioxus (rsx!)</button>
+                <button id="cg-fw-yew" onclick="selectCodegenFramework('yew')" class="px-3 py-1 rounded-md text-xs font-medium text-[#a1a1aa] hover:text-white transition-all">Yew (html!)</button>
+              </div>
+            </div>
+
+            <!-- Component Selector -->
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-[#a1a1aa]">Componente:</span>
+              <select id="cg-comp-select" onchange="updateCodegenPreview()" class="bg-[#18181b] border border-[#27272a] text-xs text-white rounded-lg px-3 py-1.5 focus:outline-none">
+                <option value="button">Button (Accesible con Variantes)</option>
+                <option value="dialog">Modal Dialog (FocusTrap + FSM)</option>
+                <option value="accordion">Accordion (Roving Tabindex)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="relative">
+            <div class="flex items-center justify-between mb-2">
+              <span id="cg-filename" class="text-[11px] font-mono text-[#a1a1aa]">src/components/button.rs</span>
+              <button onclick="copyCodegenCode()" id="cg-copy-btn" class="px-2.5 py-1 rounded bg-[#18181b] border border-[#27272a] text-xs text-[#a1a1aa] hover:text-white flex items-center gap-1 transition-all">
+                <span>📋 Copiar Código Rust</span>
+              </button>
+            </div>
+            <pre id="codegen-output" class="w-full bg-[#18181b] border border-[#27272a] rounded-xl p-4 font-mono text-xs text-emerald-400 overflow-x-auto h-64 leading-relaxed"></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 5: Zero-Node CSS Compiler & W3C Design Tokens -->
       <div id="content-css" class="space-y-4 hidden">
         <p class="text-xs text-[#a1a1aa]">
           Prueba el motor de <code class="font-mono">glastor-css-binder</code>. Ingresa clases utilitarias con variantes (<code class="font-mono">hover:</code>, <code class="font-mono">focus-visible:</code>, <code class="font-mono">dark:</code>, o valores arbitrarios como <code class="font-mono">w-[350px]</code>) y compila en vivo sin Node.js:
@@ -522,19 +713,23 @@
 
   <!-- Interactive Logic Scripts -->
   <script>
-    // Tab Switching
+    // Tab Switching across all 6 Showcase Modules
     function switchTab(tab) {
-      ['aria', 'css', 'cli'].forEach(t => {
+      ['aria', 'spring', 'grid', 'codegen', 'css', 'cli'].forEach(t => {
         const btn = document.getElementById(`tab-${t}`);
         const content = document.getElementById(`content-${t}`);
+        if (!btn || !content) return;
         if (t === tab) {
-          btn.className = 'px-3 py-1.5 rounded-md text-xs font-medium transition-all bg-[#27272a] text-white shadow-sm';
+          btn.className = 'px-3 py-1.5 rounded-md text-xs font-medium transition-all bg-[#27272a] text-white shadow-sm whitespace-nowrap';
           content.classList.remove('hidden');
         } else {
-          btn.className = 'px-3 py-1.5 rounded-md text-xs font-medium transition-all text-[#a1a1aa] hover:text-white';
+          btn.className = 'px-3 py-1.5 rounded-md text-xs font-medium transition-all text-[#a1a1aa] hover:text-white whitespace-nowrap';
           content.classList.add('hidden');
         }
       });
+      if (tab === 'spring') updateSpringSimulation();
+      if (tab === 'grid') initVirtualGrid();
+      if (tab === 'codegen') updateCodegenPreview();
       if (tab === 'css') compileLiveCss();
     }
 
@@ -761,6 +956,195 @@
         e.preventDefault();
         selectDemoTab(tabsList[targetIdx], `Key(${e.key})`);
       }
+    }
+
+    // ----------------------------------------------------
+    // Spring Motion Physics Simulation (Harmonic Oscillator)
+    // ----------------------------------------------------
+    function updateSpringSimulation() {
+      const k = parseFloat(document.getElementById('slider-stiffness').value);
+      const c = parseFloat(document.getElementById('slider-damping').value);
+      const m = parseFloat(document.getElementById('slider-mass').value);
+
+      document.getElementById('stiffness-val').innerText = k;
+      document.getElementById('damping-val').innerText = c;
+      document.getElementById('mass-val').innerText = m.toFixed(1);
+
+      const omega_n = Math.sqrt(k / m);
+      const zeta = c / (2 * Math.sqrt(k * m));
+
+      let behavior = "Crítico";
+      if (zeta < 1.0) behavior = "Subamortiguado";
+      else if (zeta > 1.0) behavior = "Sobreamortiguado";
+
+      document.getElementById('zeta-val').innerText = `${zeta.toFixed(3)} (${behavior})`;
+      document.getElementById('omega-val').innerText = `${omega_n.toFixed(2)} rad/s`;
+
+      // Generate keyframe steps for CSS
+      const steps = 10;
+      let kfCss = "@keyframes strata-spring-custom {\n";
+      for (let i = 0; i <= steps; i++) {
+        const pct = (i / steps) * 100;
+        const t = (i / steps) * 0.9;
+        let pos = 1.0;
+        if (zeta < 1.0) {
+          const omega_d = omega_n * Math.sqrt(1 - zeta * zeta);
+          const env = Math.exp(-zeta * omega_n * t);
+          pos = 1.0 - env * (Math.cos(omega_d * t) + (zeta / Math.sqrt(1 - zeta * zeta)) * Math.sin(omega_d * t));
+        } else {
+          pos = 1.0 - Math.exp(-omega_n * t);
+        }
+        const scale = (0.7 + pos * 0.3).toFixed(3);
+        kfCss += `  ${pct.toFixed(0)}% { transform: scale(${scale}) translateY(${((1 - pos) * -16).toFixed(1)}px); }\n`;
+      }
+      kfCss += "}";
+
+      let styleEl = document.getElementById('dynamic-spring-css');
+      if (!styleEl) {
+        styleEl = document.createElement('style');
+        styleEl.id = 'dynamic-spring-css';
+        document.head.appendChild(styleEl);
+      }
+      styleEl.innerHTML = kfCss;
+      document.getElementById('spring-keyframes-output').innerText = kfCss;
+    }
+
+    function setSpringPreset(preset) {
+      if (preset === 'bouncy') {
+        document.getElementById('slider-stiffness').value = 180;
+        document.getElementById('slider-damping').value = 12;
+        document.getElementById('slider-mass').value = 1.0;
+      } else if (preset === 'smooth') {
+        document.getElementById('slider-stiffness').value = 220;
+        document.getElementById('slider-damping').value = 24;
+        document.getElementById('slider-mass').value = 1.0;
+      } else if (preset === 'snappy') {
+        document.getElementById('slider-stiffness').value = 340;
+        document.getElementById('slider-damping').value = 28;
+        document.getElementById('slider-mass').value = 0.8;
+      }
+      updateSpringSimulation();
+      triggerSpringPreview();
+    }
+
+    function triggerSpringPreview() {
+      const box = document.getElementById('spring-target-box');
+      box.style.animation = 'none';
+      void box.offsetWidth;
+      box.style.animation = 'strata-spring-custom 0.85s cubic-bezier(0,0,0.2,1) forwards';
+    }
+
+    // ----------------------------------------------------
+    // Virtualized 2D Grid FSM Logic
+    // ----------------------------------------------------
+    let currentGridRow = 0;
+    let currentGridCol = 0;
+    const totalGridRows = 8;
+    const totalGridCols = 4;
+
+    function initVirtualGrid() {
+      const container = document.getElementById('virtual-grid-container');
+      if (container.children.length > 0) return;
+
+      container.innerHTML = '';
+      for (let r = 0; r < totalGridRows; r++) {
+        for (let c = 0; c < totalGridCols; c++) {
+          const cell = document.createElement('div');
+          cell.id = `grid-cell-${r}-${c}`;
+          cell.role = 'gridcell';
+          cell.className = 'grid-cell p-2.5 rounded-lg border border-[#27272a] text-center font-mono text-xs transition-all text-[#a1a1aa] hover:border-purple-500/50';
+          cell.innerText = `R${r}:C${c}`;
+          cell.onclick = () => selectGridCell(r, c);
+          container.appendChild(cell);
+        }
+      }
+      highlightGridCell(0, 0);
+    }
+
+    function selectGridCell(r, c) {
+      currentGridRow = r;
+      currentGridCol = c;
+      highlightGridCell(r, c);
+    }
+
+    function highlightGridCell(r, c) {
+      document.querySelectorAll('.grid-cell').forEach(el => {
+        el.className = 'grid-cell p-2.5 rounded-lg border border-[#27272a] text-center font-mono text-xs transition-all text-[#a1a1aa] hover:border-purple-500/50';
+        el.setAttribute('tabindex', '-1');
+      });
+      const active = document.getElementById(`grid-cell-${r}-${c}`);
+      if (active) {
+        active.className = 'grid-cell p-2.5 rounded-lg border border-purple-500 bg-purple-500/20 text-white font-bold text-center font-mono text-xs ring-1 ring-purple-500 shadow-md shadow-purple-500/10';
+        active.setAttribute('tabindex', '0');
+      }
+      document.getElementById('grid-active-coord').innerText = `Fila ${r}, Col ${c}`;
+      const visibleStart = Math.max(0, Math.min(r - 1, totalGridRows - 4));
+      document.getElementById('grid-visible-slice').innerText = `Filas ${visibleStart}..${visibleStart + 4} (4 visibles)`;
+    }
+
+    function handleGridKeydown(e) {
+      let r = currentGridRow;
+      let c = currentGridCol;
+      if (e.key === 'ArrowUp') r = Math.max(0, r - 1);
+      else if (e.key === 'ArrowDown') r = Math.min(totalGridRows - 1, r + 1);
+      else if (e.key === 'ArrowLeft') c = Math.max(0, c - 1);
+      else if (e.key === 'ArrowRight') c = Math.min(totalGridCols - 1, c + 1);
+      else if (e.key === 'Home') c = 0;
+      else if (e.key === 'End') c = totalGridCols - 1;
+      else return;
+
+      e.preventDefault();
+      selectGridCell(r, c);
+    }
+
+    // ----------------------------------------------------
+    // Multi-Framework Codegen Switcher Logic
+    // ----------------------------------------------------
+    let activeFramework = 'leptos';
+
+    function selectCodegenFramework(fw) {
+      activeFramework = fw;
+      ['leptos', 'dioxus', 'yew'].forEach(f => {
+        const btn = document.getElementById(`cg-fw-${f}`);
+        if (f === fw) {
+          btn.className = 'px-3 py-1 rounded-md text-xs font-medium bg-[#27272a] text-white transition-all shadow-sm';
+        } else {
+          btn.className = 'px-3 py-1 rounded-md text-xs font-medium text-[#a1a1aa] hover:text-white transition-all';
+        }
+      });
+      updateCodegenPreview();
+    }
+
+    function updateCodegenPreview() {
+      const comp = document.getElementById('cg-comp-select').value;
+      const fnEl = document.getElementById('cg-filename');
+      const outEl = document.getElementById('codegen-output');
+
+      fnEl.innerText = `src/components/${comp}.rs`;
+
+      if (activeFramework === 'leptos') {
+        if (comp === 'button') {
+          outEl.innerText = `use leptos::*;\n\n#[component]\npub fn AccessibleButton(\n    #[prop(default = "primary")] variant: &'static str,\n    children: Children,\n) -> impl IntoView {\n    view! {\n        <button\n            class="px-4 py-2 rounded-lg font-medium text-xs bg-primary text-primary-foreground hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none transition-all"\n            role="button"\n            tabindex="0"\n        >\n            {children()}\n        </button>\n    }\n}`;
+        } else if (comp === 'dialog') {
+          outEl.innerText = `use leptos::*;\nuse glastor_aria_core::primitives::dialog::{DialogFsm, DialogEvent};\n\n#[component]\npub fn AccessibleModal(open: ReadSignal<bool>) -> impl IntoView {\n    view! {\n        <Show when=move || open.get()>\n            <div role="dialog" aria-modal="true" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">\n                <div class="bg-[#18181b] border border-[#27272a] rounded-2xl p-6 max-w-md w-full shadow-2xl">\n                    <h3 class="text-base font-bold text-white">Modal FSM Activo</h3>\n                    <p class="text-xs text-[#a1a1aa] mt-2">Zero-Node Dialog con FocusTrap nativo de Rust.</p>\n                </div>\n            </div>\n        </Show>\n    }\n}`;
+        } else {
+          outEl.innerText = `use leptos::*;\nuse glastor_aria_core::primitives::accordion::{AccordionFsm, AccordionEvent};\n\n#[component]\npub fn AccessibleAccordion(title: &'static str, content: &'static str) -> impl IntoView {\n    let (expanded, set_expanded) = create_signal(false);\n    view! {\n        <div class="border border-[#27272a] rounded-lg overflow-hidden">\n            <button on:click=move |_| set_expanded.update(|v| *v = !*v) aria-expanded=move || expanded.get().to_string() class="w-full p-3 text-xs font-medium bg-[#18181b] flex justify-between">\n                <span>{title}</span>\n                <span>{move || if expanded.get() { "▲" } else { "▼" }}</span>\n            </button>\n            <Show when=move || expanded.get()>\n                <div class="p-3 text-xs text-[#a1a1aa] border-t border-[#27272a] bg-[#09090b]">{content}</div>\n            </Show>\n        </div>\n    }\n}`;
+        }
+      } else if (activeFramework === 'dioxus') {
+        outEl.innerText = `use dioxus::prelude::*;\n\n#[component]\npub fn ${comp === 'button' ? 'AccessibleButton' : comp === 'dialog' ? 'AccessibleModal' : 'AccessibleAccordion'}() -> Element {\n    rsx! {\n        div {\n            class: "p-4 rounded-xl border border-[#27272a] bg-[#18181b] text-white",\n            "// GLASTOR® Strata Componente Dioxus (rsx!) nativo sin node_modules"\n        }\n    }\n}`;
+      } else {
+        outEl.innerText = `use yew::prelude::*;\n\n#[function_component(${comp === 'button' ? 'AccessibleButton' : comp === 'dialog' ? 'AccessibleModal' : 'AccessibleAccordion'})]\npub fn component() -> Html {\n    html! {\n        <div class="p-4 rounded-xl border border-[#27272a] bg-[#18181b] text-white">\n            { "// GLASTOR® Strata Componente Yew (html!) nativo sin dependencias JS" }\n        </div>\n    }\n}`;
+      }
+    }
+
+    function copyCodegenCode() {
+      const code = document.getElementById('codegen-output').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        const btn = document.getElementById('cg-copy-btn');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<span>✔ ¡Copiado!</span>';
+        setTimeout(() => btn.innerHTML = orig, 2000);
+      });
     }
   </script>
 
