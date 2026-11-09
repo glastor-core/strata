@@ -337,11 +337,7 @@ impl RulesEngine {
                 "m" => return Some(format!("margin: {arbitrary};")),
                 "gap" => return Some(format!("gap: {arbitrary};")),
                 "z" => return Some(format!("z-index: {arbitrary};")),
-                "border" => {
-                    return Some(format!(
-                        "border-color: {arbitrary}; border-width: 1px; border-style: solid;"
-                    ));
-                }
+                "border" => return Some(format!("border-color: {arbitrary};")),
                 _ => {}
             }
         }
