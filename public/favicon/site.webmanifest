@@ -1,6 +1,6 @@
 {
-  "name": "GLASTOR® Core UI Engine",
-  "short_name": "GLASTOR UI",
+  "name": "GLASTOR® Strata",
+  "short_name": "Strata",
   "description": "Zero-Node Headless WAI-ARIA 1.2 and Atomic CSS Engine for Rust WebAssembly",
   "start_url": "/",
   "display": "standalone",
@@ -12,6 +12,11 @@
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
+    },
+    {
+      "src": "favicon-48x48.png",
+      "sizes": "48x48",
+      "type": "image/png"
     },
     {
       "src": "favicon-32x32.png",
