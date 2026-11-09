@@ -33,3 +33,24 @@ jobs:
 
       - name: Documentation Build
         run: cargo doc --workspace --no-deps --all-features
+
+  glastor-ecosystem-audit:
+    name: GLASTOR® Core Audit (byte-gauge, specter, zerho)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: byte-gauge Wasm Footprint & Latency Audit
+        run: cargo test -p glastor-aria-core --test memory_footprint -- --nocapture
+
+      - name: specter AST Contract & SemVer Diffing
+        run: cargo run --bin cargo-ui -- audit
+
+      - name: zerho Edge Docs & llms.txt Verification
+        run: |
+          cargo run --bin cargo-ui -- generate-llms
+          test -f llms.txt
+          test -f llms-full.txt

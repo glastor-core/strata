@@ -1,0 +1,120 @@
+# GLASTOR® UI Engine (`glastor-forge`) — Component Registry
+
+> Next-generation headless accessibility & zero-Node CSS bundling for Rust WASM.
+
+## Available Components
+
+- **`accordion`**: WCAG 2.2 Collapsible accordion with arrow keyboard navigation.
+  - Frameworks: leptos, dioxus, agnostic
+  - Dependencies: glastor-aria-core v0.1.0
+  - CLI Command: `cargo ui add accordion`
+
+- **`button`**: Accessible interactive button with focus ring, variants and loading states.
+  - Frameworks: leptos, dioxus, agnostic
+  - Dependencies: glastor-aria-core v0.1.0
+  - CLI Command: `cargo ui add button`
+
+- **`dialog`**: WAI-ARIA 1.2 modal dialog with automatic FocusTrap and DismissableLayer.
+  - Frameworks: leptos, dioxus, agnostic
+  - Dependencies: glastor-aria-core v0.1.0
+  - CLI Command: `cargo ui add dialog`
+
+## Core Features
+
+1. **Zero-Node CSS**: Powered by `glastor-css-binder`, compiles directly in `build.rs`.
+2. **WCAG 2.2 / WAI-ARIA 1.2**: Pure headless state machines in `glastor-aria-core`.
+3. **Surgical Injection**: `cargo ui add <component>` injects Rust source code directly.
+
+---
+
+# Component Source Code Specifications
+
+## Component: `accordion`
+
+> WCAG 2.2 Collapsible accordion with arrow keyboard navigation.
+
+### File: `accordion.rs`
+
+```rust
+//! Accessible Accordion Component.
+pub use glastor_aria_core::primitives::accordion::{
+    AccordionAction, AccordionEvent, AccordionFsm, AccordionItemId, AccordionMode,
+};
+
+pub struct AccordionStyles;
+
+impl AccordionStyles {
+    pub const CONTAINER: &'static str = "w-full border border-border rounded-md";
+    pub const HEADER: &'static str = "flex items-center justify-between p-4 cursor-pointer hover:bg-muted font-medium";
+    pub const PANEL: &'static str = "p-4 text-sm text-muted-foreground border-t border-border";
+}
+
+```
+
+## Component: `button`
+
+> Accessible interactive button with focus ring, variants and loading states.
+
+### File: `button.rs`
+
+```rust
+//! Accessible Button Component.
+use glastor_aria_core::attributes::{AriaAttributes, AriaRole};
+
+/// Visual button variants.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum ButtonVariant {
+    #[default]
+    Primary,
+    Secondary,
+    Outline,
+    Ghost,
+}
+
+impl ButtonVariant {
+    pub fn class_names(&self) -> &'static str {
+        match self {
+            Self::Primary => "bg-primary text-primary-foreground hover:bg-slate-800",
+            Self::Secondary => "bg-muted text-muted-foreground hover:bg-slate-100",
+            Self::Outline => "border border-border text-foreground hover:bg-muted",
+            Self::Ghost => "bg-transparent text-foreground hover:bg-muted",
+        }
+    }
+}
+
+/// Generates button classes and strict ARIA attributes.
+pub fn button_props(variant: ButtonVariant, disabled: bool) -> (&'static str, AriaAttributes) {
+    let base_classes = "inline-flex items-center justify-center rounded-md font-medium transition-all px-4 py-2 focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed";
+    let attrs = AriaAttributes::new()
+        .with_role(AriaRole::Button)
+        .with_tabindex(if disabled { -1 } else { 0 });
+    (base_classes, attrs)
+}
+
+```
+
+## Component: `dialog`
+
+> WAI-ARIA 1.2 modal dialog with automatic FocusTrap and DismissableLayer.
+
+### File: `dialog.rs`
+
+```rust
+//! Accessible Dialog Modal Component.
+pub use glastor_aria_core::primitives::dialog::{
+    DialogAction, DialogEvent, DialogFsm, DialogState,
+};
+
+/// Pre-configured styling classes for Dialog overlay and content.
+pub struct DialogStyles;
+
+impl DialogStyles {
+    pub const OVERLAY: &'static str = "fixed inset-0 bg-black bg-opacity-50 transition-all";
+    pub const CONTAINER: &'static str = "fixed inset-0 flex items-center justify-center p-4";
+    pub const CONTENT: &'static str = "bg-background text-foreground rounded-lg border border-border p-6 shadow-xl w-full max-w-md";
+    pub const TITLE: &'static str = "text-xl font-semibold text-foreground";
+    pub const DESCRIPTION: &'static str = "text-sm text-muted-foreground mt-2";
+}
+
+```
+

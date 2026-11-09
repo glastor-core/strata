@@ -1,0 +1,23 @@
+# GLASTOR® Core — Byte-Gauge Binary Size & SIMD Hardening Audit
+# https://github.com/glastor-core/byte-gauge
+# SIMD ELF/PE/Mach-O/Wasm hardening & zero-allocation verification
+
+[project]
+name = "glastor-ui-engine"
+target = "wasm32-unknown-unknown"
+
+[thresholds]
+# Strict maximum byte footprints for core WASM compilation
+max_wasm_binary_size_kb = 45
+max_state_machine_bytes = 32
+max_fsm_transition_latency_ns = 500
+
+[simd]
+# Verification of SIMD instruction vectorization in Wasm output
+enable_simd_audit = true
+allowed_features = ["simd128"]
+fail_on_unvectorized_loops = false
+
+[reports]
+output_file = "target/byte-gauge/audit-report.json"
+markdown_summary = "target/byte-gauge/summary.md"

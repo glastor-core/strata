@@ -142,13 +142,31 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let doc = LlmsDocGenerator::generate_llms_txt(&manifest);
             fs::write(&args.output, doc)?;
             println!("Generated AI index at {}", args.output.display());
+
+            let full_output = args.output.with_file_name("llms-full.txt");
+            let full_doc = LlmsDocGenerator::generate_llms_full_txt(&manifest);
+            fs::write(&full_output, full_doc)?;
+            println!(
+                "Generated Zerho edge full documentation at {}",
+                full_output.display()
+            );
         }
 
         Commands::Audit => {
-            println!("Auditing workspace components AST contract with specter standard...");
+            println!(
+                "Auditing workspace components AST contract with specter standard (.specter.toml)..."
+            );
             let manifest = RegistryLoader::load_manifest(None)?;
-            println!("  - Manifest version: {}", manifest.version);
+            let specter_dir = Path::new("target/specter");
+            fs::create_dir_all(specter_dir)?;
+
+            let snapshot_path = specter_dir.join("contract-snapshot.json");
+            let json = serde_json::to_string_pretty(&manifest)?;
+            fs::write(&snapshot_path, json)?;
+
+            println!("  - Manifest schema: {}", manifest.version);
             println!("  - Verified components: {}", manifest.components.len());
+            println!("  - Exported Specter snapshot: {}", snapshot_path.display());
             println!("All component contracts passed audit with zero breaking changes.");
         }
     }

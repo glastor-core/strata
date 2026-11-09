@@ -58,6 +58,11 @@ fn test_cli_llms_doc_generation() {
     assert!(doc.contains("`cargo ui add button`"));
     assert!(doc.contains("`cargo ui add dialog`"));
     assert!(doc.contains("`cargo ui add accordion`"));
+
+    let full_doc = LlmsDocGenerator::generate_llms_full_txt(&manifest);
+    assert!(full_doc.contains("Component Source Code Specifications"));
+    assert!(full_doc.contains("ButtonVariant"));
+    assert!(full_doc.contains("DialogStyles"));
 }
 
 #[test]

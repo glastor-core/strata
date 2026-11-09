@@ -1,0 +1,25 @@
+{
+  "$schema": "https://zerho.dev/schema/v1.json",
+  "name": "glastor-ui-engine-docs",
+  "title": "GLASTOR® UI Engine Documentation",
+  "version": "0.1.0",
+  "engine": "zerho-edge",
+  "target": "deno-deploy",
+  "edge": {
+    "target_ttfb_ms": 15,
+    "caching": {
+      "static_assets": "max-age=31536000, immutable",
+      "llms_index": "max-age=300, stale-while-revalidate=86400"
+    }
+  },
+  "docs": {
+    "source_dir": "docs",
+    "index": "index.html",
+    "llms_index": "llms.txt",
+    "llms_full": "llms-full.txt"
+  },
+  "playground": {
+    "enabled": true,
+    "frameworks": ["leptos", "dioxus", "vanilla-wasm"]
+  }
+}

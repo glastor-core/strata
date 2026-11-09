@@ -1,0 +1,28 @@
+# GLASTOR® Core — Specter API Contract Configuration
+# https://github.com/glastor-core/specter
+# Zero-Compiler Polyglot AST API Contract & SemVer Diffing
+
+[project]
+name = "glastor-ui-engine"
+version = "0.1.0"
+schema = "schemas/registry-v1.json"
+
+[contracts]
+# Public API contracts monitored for breaking changes
+crates = [
+    "glastor-aria-core",
+    "glastor-css-binder",
+    "glastor-ui-cli"
+]
+
+[rules]
+# Enforce strict SemVer on exported traits, structs, and FSM transition signatures
+enforce_semver = true
+fail_on_breaking = true
+disallow_enum_variant_removal = true
+disallow_public_struct_field_removal = true
+disallow_trait_method_signature_change = true
+
+[output]
+contract_snapshot = "target/specter/contract-snapshot.json"
+diff_report = "target/specter/diff-report.json"

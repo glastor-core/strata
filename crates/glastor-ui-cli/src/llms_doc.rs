@@ -38,4 +38,24 @@ impl LlmsDocGenerator {
 
         doc
     }
+
+    /// Generates the expanded `llms-full.txt` content including full component source code for Zerho edge docs.
+    pub fn generate_llms_full_txt(manifest: &RegistryManifest) -> String {
+        let mut doc = Self::generate_llms_txt(manifest);
+        doc.push_str("\n---\n\n# Component Source Code Specifications\n\n");
+
+        for (name, comp) in &manifest.components {
+            doc.push_str(&format!("## Component: `{name}`\n\n"));
+            doc.push_str(&format!("> {}\n\n", comp.description));
+
+            for file in &comp.files {
+                doc.push_str(&format!(
+                    "### File: `{}`\n\n```rust\n{}\n```\n\n",
+                    file.path, file.content
+                ));
+            }
+        }
+
+        doc
+    }
 }
