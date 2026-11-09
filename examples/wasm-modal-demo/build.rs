@@ -7,4 +7,3 @@ fn main() {
         .compile()
         .expect("CSS bundling compilation failed");
 }
-

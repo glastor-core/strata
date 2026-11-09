@@ -197,13 +197,57 @@ impl RulesEngine {
             "border" => return Some("border-width: 1px; border-style: solid;".into()),
             "border-0" => return Some("border-width: 0px;".into()),
             "border-2" => return Some("border-width: 2px; border-style: solid;".into()),
+            "border-b" => return Some("border-bottom-width: 1px; border-bottom-style: solid;".into()),
+            "border-t" => return Some("border-top-width: 1px; border-top-style: solid;".into()),
             "rounded-none" => return Some("border-radius: 0px;".into()),
             "rounded-sm" => return Some("border-radius: 0.125rem;".into()),
             "rounded" => return Some("border-radius: 0.25rem;".into()),
             "rounded-md" => return Some("border-radius: 0.375rem;".into()),
             "rounded-lg" => return Some("border-radius: 0.5rem;".into()),
             "rounded-xl" => return Some("border-radius: 0.75rem;".into()),
+            "rounded-2xl" => return Some("border-radius: 1rem;".into()),
             "rounded-full" => return Some("border-radius: 9999px;".into()),
+
+            // Typography Scales
+            "text-xs" => return Some("font-size: 0.75rem; line-height: 1rem;".into()),
+            "text-sm" => return Some("font-size: 0.875rem; line-height: 1.25rem;".into()),
+            "text-base" => return Some("font-size: 1rem; line-height: 1.5rem;".into()),
+            "text-lg" => return Some("font-size: 1.125rem; line-height: 1.75rem;".into()),
+            "text-xl" => return Some("font-size: 1.25rem; line-height: 1.75rem;".into()),
+            "text-2xl" => return Some("font-size: 1.5rem; line-height: 2rem;".into()),
+            "text-3xl" => return Some("font-size: 1.875rem; line-height: 2.25rem;".into()),
+            "text-5xl" => return Some("font-size: 3rem; line-height: 1;".into()),
+            "leading-tight" => return Some("line-height: 1.25;".into()),
+            "leading-relaxed" => return Some("line-height: 1.625;".into()),
+            "tracking-tight" => return Some("letter-spacing: -0.025em;".into()),
+            "tracking-wider" => return Some("letter-spacing: 0.05em;".into()),
+            "font-mono" => return Some("font-family: ui-monospace, monospace;".into()),
+            "font-sans" => return Some("font-family: ui-sans-serif, system-ui, sans-serif;".into()),
+            "font-extrabold" => return Some("font-weight: 800;".into()),
+            "font-black" => return Some("font-weight: 900;".into()),
+
+            // Layout & Overflow
+            "max-w-6xl" => return Some("max-width: 72rem;".into()),
+            "max-w-3xl" => return Some("max-width: 48rem;".into()),
+            "max-w-md" => return Some("max-width: 28rem;".into()),
+            "overflow-hidden" => return Some("overflow: hidden;".into()),
+            "overflow-y-auto" => return Some("overflow-y: auto;".into()),
+            "overflow-x-auto" => return Some("overflow-x: auto;".into()),
+            "z-50" => return Some("z-index: 50;".into()),
+            "backdrop-blur-sm" => return Some("backdrop-filter: blur(4px);".into()),
+
+            // Shadows
+            "shadow-sm" => return Some("box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);".into()),
+            "shadow-md" => return Some("box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);".into()),
+            "shadow-lg" => return Some("box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);".into()),
+            "shadow-xl" => return Some("box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);".into()),
+            "shadow-2xl" => return Some("box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);".into()),
+
+            // CSS Grid
+            "grid-cols-1" => return Some("grid-template-columns: repeat(1, minmax(0, 1fr));".into()),
+            "grid-cols-2" => return Some("grid-template-columns: repeat(2, minmax(0, 1fr));".into()),
+            "grid-cols-3" => return Some("grid-template-columns: repeat(3, minmax(0, 1fr));".into()),
+            "grid-cols-4" => return Some("grid-template-columns: repeat(4, minmax(0, 1fr));".into()),
 
             // Theme Variables mapping
             "bg-background" => return Some("background-color: var(--background);".into()),
@@ -220,6 +264,7 @@ impl RulesEngine {
             "bg-transparent" => return Some("background-color: transparent;".into()),
             "bg-white" => return Some("background-color: #ffffff;".into()),
             "bg-black" => return Some("background-color: #000000;".into()),
+            "bg-black/60" => return Some("background-color: rgba(0, 0, 0, 0.6);".into()),
             "bg-slate-900" => return Some("background-color: #0f172a;".into()),
             "bg-slate-800" => return Some("background-color: #1e293b;".into()),
             "bg-slate-100" => return Some("background-color: #f1f5f9;".into()),
@@ -281,7 +326,7 @@ impl RulesEngine {
             }
         }
 
-        // 3. Arbitrary values (e.g. w-[300px], bg-[#fff])
+        // 3. Arbitrary values (e.g. w-[300px], bg-[#fff], border-[#27272a])
         if let Some((prefix, arbitrary)) = Self::parse_arbitrary(class) {
             match prefix {
                 "w" => return Some(format!("width: {arbitrary};")),
@@ -292,6 +337,11 @@ impl RulesEngine {
                 "m" => return Some(format!("margin: {arbitrary};")),
                 "gap" => return Some(format!("gap: {arbitrary};")),
                 "z" => return Some(format!("z-index: {arbitrary};")),
+                "border" => {
+                    return Some(format!(
+                        "border-color: {arbitrary}; border-width: 1px; border-style: solid;"
+                    ));
+                }
                 _ => {}
             }
         }

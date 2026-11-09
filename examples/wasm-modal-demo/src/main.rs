@@ -25,7 +25,10 @@ fn main() {
     let items = vec!["shipping".to_string(), "payment".to_string()];
     let mut accordion = AccordionFsm::new(items, AccordionMode::Single);
     let _ = accordion.transition(AccordionEvent::ToggleItem("payment".to_string()));
-    println!("\nAccordion 'payment' expanded: {}", accordion.is_expanded("payment"));
+    println!(
+        "\nAccordion 'payment' expanded: {}",
+        accordion.is_expanded("payment")
+    );
 
     // 3. Simulated component markup containing utility classes
     let _simulated_markup = r#"
