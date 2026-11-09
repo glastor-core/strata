@@ -140,6 +140,41 @@ impl AccordionStyles {
         },
     );
 
+    // 4. Popover / Tooltip component
+    components.insert(
+        "popover".to_string(),
+        RegistryComponent {
+            name: "popover".to_string(),
+            description: "Accessible anchored floating popover / tooltip with escape and outside-click dismissal.".to_string(),
+            frameworks: vec!["leptos".to_string(), "dioxus".to_string(), "agnostic".to_string()],
+            dependencies: vec![
+                DependencyRequirement {
+                    name: "glastor-aria-core".to_string(),
+                    version: "0.1.0".to_string(),
+                    features: vec!["std".to_string()],
+                },
+            ],
+            files: vec![
+                ComponentFile {
+                    path: "popover.rs".to_string(),
+                    content: r#"//! Accessible Popover & Tooltip Component.
+pub use glastor_aria_core::primitives::popover::{
+    PopoverAction, PopoverEvent, PopoverFsm, PopoverState, PopoverTrigger,
+};
+
+pub struct PopoverStyles;
+
+impl PopoverStyles {
+    pub const TRIGGER: &'static str = "inline-flex items-center justify-center rounded-md font-medium px-4 py-2 hover:bg-muted";
+    pub const CONTENT: &'static str = "z-50 bg-background text-foreground rounded-md border border-border p-4 shadow-md outline-none w-72";
+    pub const TOOLTIP: &'static str = "z-50 bg-primary text-primary-foreground text-xs rounded px-2 py-1 shadow-sm";
+}
+"#.to_string(),
+                },
+            ],
+        },
+    );
+
     RegistryManifest {
         version: "1.0.0".to_string(),
         name: "glastor-core-canonical".to_string(),

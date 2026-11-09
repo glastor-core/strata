@@ -19,6 +19,11 @@
   - Dependencies: glastor-aria-core v0.1.0
   - CLI Command: `cargo ui add dialog`
 
+- **`popover`**: Accessible anchored floating popover / tooltip with escape and outside-click dismissal.
+  - Frameworks: leptos, dioxus, agnostic
+  - Dependencies: glastor-aria-core v0.1.0
+  - CLI Command: `cargo ui add popover`
+
 ## Core Features
 
 1. **Zero-Node CSS**: Powered by `glastor-css-binder`, compiles directly in `build.rs`.
@@ -114,6 +119,28 @@ impl DialogStyles {
     pub const CONTENT: &'static str = "bg-background text-foreground rounded-lg border border-border p-6 shadow-xl w-full max-w-md";
     pub const TITLE: &'static str = "text-xl font-semibold text-foreground";
     pub const DESCRIPTION: &'static str = "text-sm text-muted-foreground mt-2";
+}
+
+```
+
+## Component: `popover`
+
+> Accessible anchored floating popover / tooltip with escape and outside-click dismissal.
+
+### File: `popover.rs`
+
+```rust
+//! Accessible Popover & Tooltip Component.
+pub use glastor_aria_core::primitives::popover::{
+    PopoverAction, PopoverEvent, PopoverFsm, PopoverState, PopoverTrigger,
+};
+
+pub struct PopoverStyles;
+
+impl PopoverStyles {
+    pub const TRIGGER: &'static str = "inline-flex items-center justify-center rounded-md font-medium px-4 py-2 hover:bg-muted";
+    pub const CONTENT: &'static str = "z-50 bg-background text-foreground rounded-md border border-border p-4 shadow-md outline-none w-72";
+    pub const TOOLTIP: &'static str = "z-50 bg-primary text-primary-foreground text-xs rounded px-2 py-1 shadow-sm";
 }
 
 ```

@@ -19,6 +19,11 @@
   - Dependencies: glastor-aria-core v0.1.0
   - CLI Command: `cargo ui add dialog`
 
+- **`popover`**: Accessible anchored floating popover / tooltip with escape and outside-click dismissal.
+  - Frameworks: leptos, dioxus, agnostic
+  - Dependencies: glastor-aria-core v0.1.0
+  - CLI Command: `cargo ui add popover`
+
 ## Core Features
 
 1. **Zero-Node CSS**: Powered by `glastor-css-binder`, compiles directly in `build.rs`.
