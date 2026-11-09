@@ -26,3 +26,4 @@ disallow_trait_method_signature_change = true
 [output]
 contract_snapshot = "target/specter/contract-snapshot.json"
 diff_report = "target/specter/diff-report.json"
+

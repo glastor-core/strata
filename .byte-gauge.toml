@@ -21,3 +21,4 @@ fail_on_unvectorized_loops = false
 [reports]
 output_file = "target/byte-gauge/audit-report.json"
 markdown_summary = "target/byte-gauge/summary.md"
+

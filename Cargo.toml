@@ -4,6 +4,7 @@ members = [
     "crates/glastor-aria-core",
     "crates/glastor-css-binder",
     "crates/glastor-ui-cli",
+    "examples/wasm-modal-demo",
 ]
 
 [workspace.package]

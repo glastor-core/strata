@@ -23,3 +23,4 @@
     "frameworks": ["leptos", "dioxus", "vanilla-wasm"]
   }
 }
+
