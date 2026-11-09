@@ -1,7 +1,7 @@
 # GLASTOR® Strata
 
 [![CI](https://github.com/glastor-core/strata/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/glastor-core/strata/actions/workflows/ci.yml)
-[![Crates.io](https://img.shields.io/badge/crates.io-v0.1.0--pending-yellow.svg)](https://crates.io/crates/glastor-aria-core)
+[![Crates.io](https://img.shields.io/crates/v/glastor-aria-core.svg)](https://crates.io/crates/glastor-aria-core)
 [![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](LICENSE-MIT)
 [![Rust 2024](https://img.shields.io/badge/rust-2024%20edition-orange.svg)](https://www.rust-lang.org)
 [![Protected Branch](https://img.shields.io/badge/branch-main%20%5Bprotected%5D-success.svg)](.github/BRANCH_PROTECTION.md)
