@@ -4,6 +4,7 @@ use glastor_aria_core::fsm::StateMachine;
 use glastor_aria_core::primitives::accordion::AccordionMode;
 use glastor_aria_core::primitives::dialog::{DialogEvent, DialogFsm, DialogState};
 use glastor_aria_core::primitives::focus_trap::FocusTrapState;
+use glastor_aria_core::primitives::grid::{CellCoord, GridSelectionMode};
 use glastor_aria_core::primitives::tabs::TabsActivationMode;
 use glastor_aria_core::primitives::toast::ToastPriority;
 use std::mem::size_of;
@@ -16,6 +17,8 @@ fn test_byte_gauge_memory_compactness() {
     assert!(size_of::<AccordionMode>() <= 1);
     assert!(size_of::<TabsActivationMode>() <= 1);
     assert!(size_of::<ToastPriority>() <= 1);
+    assert!(size_of::<GridSelectionMode>() <= 1);
+    assert!(size_of::<CellCoord>() == 8); // two u32s
     assert!(size_of::<FocusTrapState>() <= 32);
 
     println!(

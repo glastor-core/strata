@@ -236,9 +236,47 @@ pub struct ToastStyles;
 
 impl ToastStyles {
     pub const VIEWPORT: &'static str = "fixed bottom-0 right-0 z-50 flex max-h-screen w-full flex-col-reverse p-4";
-    pub const TOAST: &'static str = "flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border border-border p-4 shadow-lg transition-all bg-background text-foreground";
+    pub const TOAST: &'static str = "flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border border-border p-4 shadow-lg transition-all bg-background text-foreground animate-spring-bounce";
     pub const TITLE: &'static str = "text-sm font-semibold";
     pub const DESCRIPTION: &'static str = "text-sm text-muted-foreground";
+}
+"#.to_string(),
+                },
+            ],
+        },
+    );
+
+    // 7. Virtual Data Grid component
+    components.insert(
+        "grid".to_string(),
+        RegistryComponent {
+            name: "grid".to_string(),
+            description: "High-performance virtualized 2D data grid with WAI-ARIA 1.2 roving focus and SIMD sorting.".to_string(),
+            frameworks: vec!["leptos".to_string(), "dioxus".to_string(), "agnostic".to_string()],
+            dependencies: vec![
+                DependencyRequirement {
+                    name: "glastor-aria-core".to_string(),
+                    version: "0.1.0".to_string(),
+                    features: vec!["std".to_string()],
+                },
+            ],
+            files: vec![
+                ComponentFile {
+                    path: "grid.rs".to_string(),
+                    content: r#"//! Accessible Virtual Data Grid Component.
+pub use glastor_aria_core::primitives::grid::{
+    CellCoord, GridAction, GridDirection, GridEvent, GridSelectionMode, GridState, VirtualGridFsm,
+    VirtualSlice,
+};
+
+pub struct GridStyles;
+
+impl GridStyles {
+    pub const CONTAINER: &'static str = "relative overflow-auto border border-border rounded-xl bg-card";
+    pub const TABLE: &'static str = "w-full text-left text-sm text-foreground";
+    pub const ROW: &'static str = "border-b border-border transition-colors hover:bg-muted";
+    pub const HEADER_CELL: &'static str = "h-10 px-4 font-semibold text-muted-foreground";
+    pub const DATA_CELL: &'static str = "p-4 focus:outline-none focus:ring-2 focus:ring-ring";
 }
 "#.to_string(),
                 },

@@ -58,11 +58,37 @@ fn test_cli_llms_doc_generation() {
     assert!(doc.contains("`cargo ui add button`"));
     assert!(doc.contains("`cargo ui add dialog`"));
     assert!(doc.contains("`cargo ui add accordion`"));
+    assert!(doc.contains("`cargo ui add grid`"));
 
     let full_doc = LlmsDocGenerator::generate_llms_full_txt(&manifest);
     assert!(full_doc.contains("Component Source Code Specifications"));
     assert!(full_doc.contains("ButtonVariant"));
     assert!(full_doc.contains("DialogStyles"));
+}
+
+#[test]
+fn test_tokens_sync_pipeline() {
+    use glastor_ui_cli::tokens_sync::TokensSynchronizer;
+
+    let json = r##"{
+        "color": {
+            "brand": {
+                "$value": "#3b82f6",
+                "$type": "color"
+            }
+        }
+    }"##;
+
+    let mut sync = TokensSynchronizer::new();
+    let count = sync.parse_json(json).expect("valid parse");
+    assert_eq!(count, 1);
+
+    let css = sync.to_css();
+    assert!(css.contains("--color-brand: #3b82f6;"));
+
+    let rs = sync.to_rust_code();
+    assert!(rs.contains("pub mod color"));
+    assert!(rs.contains(r"pub const BRAND: &str = "));
 }
 
 #[test]

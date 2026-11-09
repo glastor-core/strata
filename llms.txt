@@ -19,6 +19,11 @@
   - Dependencies: glastor-aria-core v0.1.0
   - CLI Command: `cargo ui add dialog`
 
+- **`grid`**: High-performance virtualized 2D data grid with WAI-ARIA 1.2 roving focus and SIMD sorting.
+  - Frameworks: leptos, dioxus, agnostic
+  - Dependencies: glastor-aria-core v0.1.0
+  - CLI Command: `cargo ui add grid`
+
 - **`popover`**: Accessible anchored floating popover / tooltip with escape and outside-click dismissal.
   - Frameworks: leptos, dioxus, agnostic
   - Dependencies: glastor-aria-core v0.1.0

@@ -12,11 +12,13 @@
 
 pub mod build_binder;
 pub mod minifier;
+pub mod motion;
 pub mod rules;
 pub mod scanner;
 
 pub use build_binder::{BuildBinder, BuildBinderError};
 pub use minifier::CssMinifier;
+pub use motion::SpringConfig;
 pub use rules::{RulesEngine, ThemeTokens};
 pub use scanner::{ScanError, SourceScanner};
 
@@ -47,6 +49,21 @@ mod tests {
         let theme_css = theme.to_css();
         assert!(theme_css.contains("--radius: 0.5rem;"));
         assert!(theme_css.contains("--primary: #18181b;"));
+    }
+
+    #[test]
+    fn test_rules_engine_spring_animations() {
+        let classes = vec![
+            "animate-spring-in".to_string(),
+            "animate-spring-bounce".to_string(),
+        ];
+        let engine = RulesEngine::new();
+        let css = engine.compile_stylesheet(&classes);
+
+        assert!(css.contains("@keyframes spring-in"));
+        assert!(css.contains("@keyframes spring-bounce"));
+        assert!(css.contains(".animate-spring-in { animation: spring-in 0.4s both; }"));
+        assert!(css.contains(".animate-spring-bounce { animation: spring-bounce 0.5s both; }"));
     }
 
     #[test]

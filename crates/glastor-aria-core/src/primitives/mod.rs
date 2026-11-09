@@ -4,6 +4,7 @@ pub mod accordion;
 pub mod dialog;
 pub mod dismissable;
 pub mod focus_trap;
+pub mod grid;
 pub mod popover;
 pub mod roving_tabindex;
 pub mod tabs;
@@ -20,6 +21,10 @@ pub use dismissable::{
 };
 pub use focus_trap::{
     FocusTrapAction, FocusTrapEvent, FocusTrapFsm, FocusTrapState, SentinelBoundary,
+};
+pub use grid::{
+    CellCoord, GridAction, GridDirection, GridEvent, GridSelectionMode, GridState, VirtualGridFsm,
+    VirtualSlice,
 };
 pub use popover::{PopoverAction, PopoverEvent, PopoverFsm, PopoverState, PopoverTrigger};
 pub use roving_tabindex::{

@@ -190,6 +190,48 @@
             </div>
           </div>
 
+          <!-- Tabs & Roving Focus Demo (TabsFsm) -->
+          <div class="border border-[#27272a] rounded-xl p-5 bg-[#09090b] space-y-4">
+            <div class="flex items-center justify-between">
+              <h4 class="font-semibold text-sm flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                TabsFsm &amp; Roving Focus
+              </h4>
+              <span class="text-xs font-mono text-[#a1a1aa]">WAI-ARIA 1.2</span>
+            </div>
+            <p class="text-xs text-[#a1a1aa]">
+              Navegación accesible con flechas (<kbd class="px-1 py-0.5 rounded bg-[#18181b] border border-[#27272a] text-[10px]">←</kbd> / <kbd class="px-1 py-0.5 rounded bg-[#18181b] border border-[#27272a] text-[10px]">→</kbd>), activación automática y paneles sincronizados con <code class="text-xs">aria-selected</code>.
+            </p>
+            
+            <div class="space-y-3">
+              <div role="tablist" aria-label="Tecnologías GLASTOR" class="flex space-x-1 bg-[#18181b] p-1 rounded-lg border border-[#27272a]">
+                <button id="fsm-tab-rust" role="tab" aria-selected="true" aria-controls="panel-rust" tabindex="0" onclick="selectDemoTab('rust')" onkeydown="handleTabsKey(event, 'rust')" class="fsm-tab-btn px-3 py-1.5 rounded-md text-xs font-medium bg-[#27272a] text-white transition-all shadow-sm">
+                  Rust Core
+                </button>
+                <button id="fsm-tab-wasm" role="tab" aria-selected="false" aria-controls="panel-wasm" tabindex="-1" onclick="selectDemoTab('wasm')" onkeydown="handleTabsKey(event, 'wasm')" class="fsm-tab-btn px-3 py-1.5 rounded-md text-xs font-medium text-[#a1a1aa] hover:text-white transition-all">
+                  Zero-Node CSS
+                </button>
+                <button id="fsm-tab-aria" role="tab" aria-selected="false" aria-controls="panel-aria" tabindex="-1" onclick="selectDemoTab('aria')" onkeydown="handleTabsKey(event, 'aria')" class="fsm-tab-btn px-3 py-1.5 rounded-md text-xs font-medium text-[#a1a1aa] hover:text-white transition-all">
+                  WAI-ARIA 1.2
+                </button>
+              </div>
+
+              <div id="panel-rust" role="tabpanel" aria-labelledby="fsm-tab-rust" class="fsm-tabpanel text-xs text-[#a1a1aa] p-3 rounded-lg bg-[#18181b] border border-[#27272a]">
+                Primitivas FSM de estado puro sin asignaciones en heap con tiempo de conmutación &lt;500ns validadas por <strong class="text-white">byte-gauge</strong>.
+              </div>
+              <div id="panel-wasm" role="tabpanel" aria-labelledby="fsm-tab-wasm" class="fsm-tabpanel text-xs text-[#a1a1aa] p-3 rounded-lg bg-[#18181b] border border-[#27272a] hidden">
+                Compilación y minificación de utilidades CSS en menos de 35ms en tiempo de build o mediante el daemon <strong class="text-white">cargo ui watch</strong>.
+              </div>
+              <div id="panel-aria" role="tabpanel" aria-labelledby="fsm-tab-aria" class="fsm-tabpanel text-xs text-[#a1a1aa] p-3 rounded-lg bg-[#18181b] border border-[#27272a] hidden">
+                Gestión estricta de atributos W3C, centinelas de focus trap y navegación roving tabindex garantizada sin JavaScript imperativo frágil.
+              </div>
+            </div>
+
+            <div id="tabs-fsm-log" class="text-[11px] font-mono bg-[#18181b] border border-[#27272a] p-2.5 rounded-lg text-[#a1a1aa]">
+              Tab activa: <span class="text-cyan-400 font-semibold" id="tabs-fsm-active">rust</span> | Modo: <span class="text-emerald-400">Automatic</span> | Evento: <span id="tabs-fsm-event">Init</span>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -623,12 +665,14 @@
         respLine.className = 'text-[#a1a1aa] pl-4';
 
         if (cmd === 'cargo ui list') {
-          respLine.innerHTML = `GLASTOR UI Registry [glastor-core-canonical]:<br> * accordion — WCAG 2.2 Collapsible accordion<br> * button — Accessible button with focus ring<br> * dialog — WAI-ARIA 1.2 modal with FocusTrap<br> * popover — Anchored floating popover/tooltip<br> * tabs — WAI-ARIA 1.2 Tabs list<br> * toast — WCAG 2.2 live region toast notifications`;
+          respLine.innerHTML = `GLASTOR UI Registry [glastor-core-canonical]:<br> * accordion — WCAG 2.2 Collapsible accordion<br> * button — Accessible button with focus ring<br> * dialog — WAI-ARIA 1.2 modal with FocusTrap<br> * grid — High-performance 2D virtualized data grid with roving focus<br> * popover — Anchored floating popover/tooltip<br> * tabs — WAI-ARIA 1.2 Tabs list<br> * toast — WCAG 2.2 live region toast notifications`;
         } else if (cmd.startsWith('cargo ui add')) {
           const comp = cmd.replace('cargo ui add', '').trim() || 'button';
-          respLine.innerHTML = `Installing '${comp}'...<br>  + Created src/components/ui/${comp}.rs<br>  + Updated src/components/ui/mod.rs<br>Component '${comp}' added successfully.`;
+          respLine.innerHTML = `Installing '${comp}'...<br>  + Created src/components/ui/${comp.split(' ')[0]}.rs<br>  + Updated src/components/ui/mod.rs<br>Component '${comp.split(' ')[0]}' added successfully.`;
+        } else if (cmd.startsWith('cargo ui sync-tokens')) {
+          respLine.innerHTML = `Parsing W3C Design Tokens from 'tokens.json'...<br>  + Generated CSS tokens at dist/tokens.css (11 variables)<br>  + Generated typed Rust module at src/tokens.rs<br>Tokens synchronized successfully.`;
         } else if (cmd === 'cargo ui audit') {
-          respLine.innerHTML = `Auditing workspace components AST contract with specter standard...<br>Verified components: 6<br>All component contracts passed audit with zero breaking changes.`;
+          respLine.innerHTML = `Auditing workspace components AST contract with specter standard...<br>Verified components: 7<br>All component contracts passed audit with zero breaking changes.`;
         } else if (cmd === 'cargo ui generate-llms') {
           respLine.innerHTML = `Generated AI index at llms.txt (ready for zerho deployment).`;
         } else if (cmd.startsWith('cargo ui watch')) {
@@ -636,7 +680,7 @@
         } else if (cmd.startsWith('cargo ui lint-a11y')) {
           respLine.innerHTML = `Running static accessibility audit (WCAG 2.2 / WAI-ARIA)...<br>  [PASS] 0 accessibility violations found. Codebase is WCAG 2.2 AA compliant!`;
         } else {
-          respLine.innerHTML = `Comando no reconocido. Prueba: 'cargo ui list', 'cargo ui add tabs', 'cargo ui watch', 'cargo ui lint-a11y'.`;
+          respLine.innerHTML = `Comando no reconocido. Prueba: 'cargo ui list', 'cargo ui add grid --framework leptos', 'cargo ui sync-tokens', 'cargo ui watch', 'cargo ui lint-a11y'.`;
         }
 
         history.appendChild(respLine);
@@ -680,6 +724,46 @@
           }
         }, 300);
       }, 3500);
+    }
+
+    // TabsFsm Demo Logic
+    const tabsList = ['rust', 'wasm', 'aria'];
+    function selectDemoTab(tabId, eventTrigger = 'Click') {
+      tabsList.forEach(id => {
+        const btn = document.getElementById(`fsm-tab-${id}`);
+        const panel = document.getElementById(`panel-${id}`);
+        const isActive = id === tabId;
+        btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        btn.setAttribute('tabindex', isActive ? '0' : '-1');
+        if (isActive) {
+          btn.className = 'fsm-tab-btn px-3 py-1.5 rounded-md text-xs font-medium bg-[#27272a] text-white transition-all shadow-sm';
+          panel.classList.remove('hidden');
+          btn.focus();
+        } else {
+          btn.className = 'fsm-tab-btn px-3 py-1.5 rounded-md text-xs font-medium text-[#a1a1aa] hover:text-white transition-all';
+          panel.classList.add('hidden');
+        }
+      });
+      document.getElementById('tabs-fsm-active').innerText = tabId;
+      document.getElementById('tabs-fsm-event').innerText = eventTrigger;
+    }
+
+    function handleTabsKey(e, currentTab) {
+      const idx = tabsList.indexOf(currentTab);
+      let targetIdx = null;
+      if (e.key === 'ArrowRight') {
+        targetIdx = (idx + 1) % tabsList.length;
+      } else if (e.key === 'ArrowLeft') {
+        targetIdx = (idx - 1 + tabsList.length) % tabsList.length;
+      } else if (e.key === 'Home') {
+        targetIdx = 0;
+      } else if (e.key === 'End') {
+        targetIdx = tabsList.length - 1;
+      }
+      if (targetIdx !== null) {
+        e.preventDefault();
+        selectDemoTab(tabsList[targetIdx], `Key(${e.key})`);
+      }
     }
   </script>
 

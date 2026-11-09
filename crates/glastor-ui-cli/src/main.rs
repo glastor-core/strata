@@ -40,6 +40,8 @@ enum Commands {
     Audit,
     /// Statically audit components for WCAG 2.2 and WAI-ARIA compliance.
     LintA11y(LintA11yArgs),
+    /// Synchronize W3C DTCG design tokens (Figma/Penpot) to CSS variables and typed Rust constants.
+    SyncTokens(SyncTokensArgs),
 }
 
 #[derive(Debug, Args)]
@@ -54,11 +56,27 @@ struct InitArgs {
 
 #[derive(Debug, Args)]
 struct AddArgs {
-    /// Name of the component to install (e.g. "button", "dialog", "accordion").
+    /// Name of the component to install (e.g. "button", "dialog", "accordion", "grid").
     component: String,
+    /// Framework target ("leptos", "dioxus", or "agnostic").
+    #[arg(short, long)]
+    framework: Option<String>,
     /// Override destination directory for the component code.
     #[arg(short, long)]
     target_dir: Option<PathBuf>,
+}
+
+#[derive(Debug, Args)]
+struct SyncTokensArgs {
+    /// Path to W3C DTCG tokens JSON file (e.g. tokens.json).
+    #[arg(short, long, default_value = "tokens.json")]
+    input: PathBuf,
+    /// Output CSS file with :root custom properties.
+    #[arg(short, long, default_value = "dist/tokens.css")]
+    output_css: PathBuf,
+    /// Optional path to generate a strongly-typed Rust module (e.g. src/tokens.rs).
+    #[arg(long)]
+    output_rs: Option<PathBuf>,
 }
 
 #[derive(Debug, Args)]
@@ -117,9 +135,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::Add(args) => {
             let manifest = RegistryLoader::load_manifest(None)?;
             let target_dir = args.target_dir.unwrap_or(config.components_dir);
+            let framework = args.framework.as_deref().unwrap_or(&config.framework);
 
             if let Some(comp) = manifest.components.get(&args.component) {
-                println!("Installing component '{}'...", comp.name);
+                println!(
+                    "Installing component '{}' [target framework: {}]...",
+                    comp.name, framework
+                );
                 let files = ComponentInjector::inject_component(comp, &target_dir)?;
                 for f in files {
                     println!("  + Created {}", f);
@@ -257,6 +279,42 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     std::process::exit(1);
                 }
             }
+        }
+
+        Commands::SyncTokens(args) => {
+            println!(
+                "Parsing W3C Design Tokens from '{}'...",
+                args.input.display()
+            );
+            if !args.input.exists() {
+                eprintln!("Error: Tokens file '{}' not found.", args.input.display());
+                std::process::exit(1);
+            }
+            let raw = fs::read_to_string(&args.input)?;
+            let mut sync = glastor_ui_cli::tokens_sync::TokensSynchronizer::new();
+            let count = sync
+                .parse_json(&raw)
+                .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
+
+            if let Some(parent) = args.output_css.parent() {
+                fs::create_dir_all(parent)?;
+            }
+            fs::write(&args.output_css, sync.to_css())?;
+            println!(
+                "  + Generated CSS tokens at {} ({} variables)",
+                args.output_css.display(),
+                count
+            );
+
+            if let Some(ref rs_path) = args.output_rs {
+                if let Some(parent) = rs_path.parent() {
+                    fs::create_dir_all(parent)?;
+                }
+                fs::write(rs_path, sync.to_rust_code())?;
+                println!("  + Generated typed Rust module at {}", rs_path.display());
+            }
+
+            println!("Tokens synchronized successfully.");
         }
     }
 

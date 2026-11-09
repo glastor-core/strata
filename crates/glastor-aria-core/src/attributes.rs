@@ -43,6 +43,10 @@ pub enum AriaRole {
     Status,
     /// Alert live region notification.
     Alert,
+    /// Interactive grid or spreadsheet table container.
+    Grid,
+    /// Cell within a grid or spreadsheet table.
+    Gridcell,
 }
 
 impl AriaRole {
@@ -65,6 +69,8 @@ impl AriaRole {
             Self::Tooltip => "tooltip",
             Self::Status => "status",
             Self::Alert => "alert",
+            Self::Grid => "grid",
+            Self::Gridcell => "gridcell",
         }
     }
 }
@@ -160,6 +166,14 @@ pub struct AriaAttributes {
     pub live: Option<String>,
     /// tabindex attribute ("0" or "-1")
     pub tabindex: Option<i8>,
+    /// aria-rowcount for data grids
+    pub rowcount: Option<u32>,
+    /// aria-colcount for data grids
+    pub colcount: Option<u32>,
+    /// aria-rowindex for data grid cells
+    pub rowindex: Option<u32>,
+    /// aria-colindex for data grid cells
+    pub colindex: Option<u32>,
 }
 
 impl AriaAttributes {
@@ -252,6 +266,30 @@ impl AriaAttributes {
         self
     }
 
+    /// Sets the `aria-rowcount` attribute.
+    pub fn with_rowcount(mut self, count: u32) -> Self {
+        self.rowcount = Some(count);
+        self
+    }
+
+    /// Sets the `aria-colcount` attribute.
+    pub fn with_colcount(mut self, count: u32) -> Self {
+        self.colcount = Some(count);
+        self
+    }
+
+    /// Sets the `aria-rowindex` attribute.
+    pub fn with_rowindex(mut self, index: u32) -> Self {
+        self.rowindex = Some(index);
+        self
+    }
+
+    /// Sets the `aria-colindex` attribute.
+    pub fn with_colindex(mut self, index: u32) -> Self {
+        self.colindex = Some(index);
+        self
+    }
+
     /// Converts the collection of attributes to standard key-value string pairs.
     pub fn to_key_values(&self) -> Vec<(&'static str, String)> {
         let mut pairs = Vec::with_capacity(8);
@@ -297,6 +335,18 @@ impl AriaAttributes {
         }
         if let Some(idx) = self.tabindex {
             pairs.push(("tabindex", idx.to_string()));
+        }
+        if let Some(rc) = self.rowcount {
+            pairs.push(("aria-rowcount", rc.to_string()));
+        }
+        if let Some(cc) = self.colcount {
+            pairs.push(("aria-colcount", cc.to_string()));
+        }
+        if let Some(ri) = self.rowindex {
+            pairs.push(("aria-rowindex", ri.to_string()));
+        }
+        if let Some(ci) = self.colindex {
+            pairs.push(("aria-colindex", ci.to_string()));
         }
 
         pairs
