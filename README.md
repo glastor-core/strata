@@ -1,10 +1,13 @@
 # GLASTOR® Strata
 
 [![CI](https://github.com/glastor-core/strata/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/glastor-core/strata/actions/workflows/ci.yml)
-[![Crates.io](https://img.shields.io/crates/v/glastor-aria-core.svg)](https://crates.io/crates/glastor-aria-core)
-[![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](LICENSE-MIT)
-[![Rust 2024](https://img.shields.io/badge/rust-2024%20edition-orange.svg)](https://www.rust-lang.org)
-[![Protected Branch](https://img.shields.io/badge/branch-main%20%5Bprotected%5D-success.svg)](.github/BRANCH_PROTECTION.md)
+[![glastor-aria-core](https://img.shields.io/crates/v/glastor-aria-core.svg?style=flat-square&color=orange&logo=rust)](https://crates.io/crates/glastor-aria-core)
+[![aria downloads](https://img.shields.io/crates/d/glastor-aria-core.svg?style=flat-square&color=blue)](https://crates.io/crates/glastor-aria-core)
+[![glastor-css-binder](https://img.shields.io/crates/v/glastor-css-binder.svg?style=flat-square&color=orange&logo=rust)](https://crates.io/crates/glastor-css-binder)
+[![glastor-ui-cli](https://img.shields.io/crates/v/glastor-ui-cli.svg?style=flat-square&color=orange&logo=rust)](https://crates.io/crates/glastor-ui-cli)
+[![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg?style=flat-square)](LICENSE-MIT)
+[![Rust 2024](https://img.shields.io/badge/rust-2024%20edition-orange.svg?style=flat-square)](https://www.rust-lang.org)
+[![Protected Branch](https://img.shields.io/badge/branch-main%20%5Bprotected%5D-success.svg?style=flat-square)](.github/BRANCH_PROTECTION.md)
 
 > **Next-generation, zero-Node.js headless accessibility & style bundling engine for Rust web applications (Leptos, Dioxus, Yew).**
 
