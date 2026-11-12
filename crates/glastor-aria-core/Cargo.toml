@@ -7,6 +7,7 @@ authors.workspace = true
 license.workspace = true
 repository.workspace = true
 homepage.workspace = true
+documentation = "https://docs.rs/glastor-aria-core"
 readme = "README.md"
 description = "Headless WAI-ARIA 1.2 accessibility primitives and deterministic FSMs for Rust web frameworks."
 keywords = ["accessibility", "aria", "wcag", "headless", "leptos"]

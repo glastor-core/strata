@@ -7,6 +7,7 @@ authors.workspace = true
 license.workspace = true
 repository.workspace = true
 homepage.workspace = true
+documentation = "https://docs.rs/glastor-css-binder"
 readme = "README.md"
 description = "Native Zero-Node CSS scanning, compilation and bundling engine for Rust web applications."
 keywords = ["css", "bundler", "zero-node", "tailwind", "wasm"]

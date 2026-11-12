@@ -7,6 +7,7 @@ authors.workspace = true
 license.workspace = true
 repository.workspace = true
 homepage.workspace = true
+documentation = "https://docs.rs/glastor-ui-cli"
 readme = "README.md"
 description = "Decentralized UI distribution and code injection CLI for the Rust Cargo ecosystem."
 keywords = ["cli", "cargo", "components", "shadcn", "wasm"]
