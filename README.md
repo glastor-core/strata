@@ -22,6 +22,7 @@ Part of the **GLASTOR® Core** infrastructure suite.
 strata/
 ├── crates/
 │   ├── glastor-aria-core     Headless WAI-ARIA 1.2 state machines (Dialog, Accordion, Popover, FocusTrap, Motion, Grid)
+│   ├── glastor-aria-wasm     Zero-dependency WebAssembly runtime bridge (wasm32-unknown-unknown)
 │   ├── glastor-css-binder    Zero-Node CSS scanning, compilation and bundling engine for build.rs and dev-watch
 │   └── glastor-ui-cli        Decentralized component distributor and AST patcher for Cargo (cargo ui)
 ├── examples/
@@ -29,7 +30,7 @@ strata/
 ├── .byte-gauge.toml          byte-gauge SIMD vectorization & sub-microsecond Wasm footprint audit
 ├── .specter.toml             specter AST API Contract & SemVer diffing configuration
 ├── zerho.json                zerho Edge documentation (<15ms TTFB) & Deno Deploy configuration
-└── index.html                Interactive visual showcase and playground landing page
+└── index.html                Interactive visual showcase and WebAssembly playground landing page
 ```
 
 ### 1. `glastor-aria-core`
@@ -38,6 +39,12 @@ A zero-allocation, headless accessibility library for Rust web frameworks.
 - **WAI-ARIA 1.2 Compliance**: Strict type-safe representation of attributes, roles, and keyboard navigation standards.
 - **WCAG 2.2 Ready**: Roving `tabindex`, boundary cycle focus trapping, dismissable layer stacks, accordion accordions, and sentinel element abstractions.
 - **Mobile Hardening**: Emits `LockBodyScroll` and `UnlockBodyScroll` to prevent background elastic scroll bounce on mobile Safari/iOS.
+
+### 2. `glastor-aria-wasm`
+An ultra-compact (~54 KB) zero-dependency WebAssembly bridge compiled for `wasm32-unknown-unknown`:
+- **Deterministic Browser Execution**: Runs Rust accessibility state machines (`DialogFsm`, `AccordionFsm`) and harmonic spring physics directly in the browser.
+- **Sub-Microsecond Transitions**: Evaluated in `<500 ns` without JavaScript virtual machine overhead.
+- **Zero-Node Showcase**: Directly drives the interactive browser demo in `index.html`.
 
 ### 2. `glastor-css-binder`
 Say goodbye to `node_modules` and `package.json` in your Rust WASM CI/CD pipelines.

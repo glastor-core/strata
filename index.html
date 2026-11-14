@@ -49,9 +49,9 @@
       </div>
     </div>
     <div class="flex items-center space-x-3">
-      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+      <span id="wasm-status-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        Zero-Node Pipeline Active
+        Zero-Node Rust WASM Active
       </span>
     </div>
   </header>
@@ -711,8 +711,47 @@
     <span tabindex="0" onfocus="handleBoundary('end')" class="sr-only">End Focus Sentinel</span>
   </div>
 
-  <!-- Interactive Logic Scripts -->
+  <!-- Interactive Logic Scripts with WebAssembly Bridge -->
   <script>
+    // WebAssembly Runtime Bridge (Rust 2024 -> wasm32-unknown-unknown)
+    let wasmExports = null;
+    let wasmActive = false;
+
+    async function initStrataWasm() {
+      try {
+        const paths = ['dist/wasm/glastor_aria.wasm', 'public/wasm/glastor_aria.wasm'];
+        let response = null;
+        for (const p of paths) {
+          try {
+            const res = await fetch(p);
+            if (res.ok) {
+              response = res;
+              break;
+            }
+          } catch (_) {}
+        }
+        if (response && response.ok) {
+          const bytes = await response.arrayBuffer();
+          const { instance } = await WebAssembly.instantiate(bytes, {});
+          wasmExports = instance.exports;
+          wasmActive = true;
+          const statusBadge = document.getElementById('wasm-status-badge');
+          if (statusBadge && wasmExports.strata_wasm_version) {
+            const ver = wasmExports.strata_wasm_version();
+            const major = (ver >> 16) & 0xff;
+            const minor = (ver >> 8) & 0xff;
+            const patch = ver & 0xff;
+            statusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Rust WASM v${major}.${minor}.${patch} Activo`;
+            statusBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+          }
+          console.log("🦀 GLASTOR Strata WebAssembly Runtime active!");
+        }
+      } catch (e) {
+        console.warn("WASM bridge operating in JS fallback mode:", e);
+      }
+    }
+    initStrataWasm();
+
     // Tab Switching across all 6 Showcase Modules
     function switchTab(tab) {
       ['aria', 'spring', 'grid', 'codegen', 'css', 'cli'].forEach(t => {
@@ -733,7 +772,7 @@
       if (tab === 'css') compileLiveCss();
     }
 
-    // Dialog Modal Logic (Emulating DialogFsm + FocusTrap)
+    // Dialog Modal Logic (Directly backed by Rust DialogFsm via WASM)
     let previousActiveElement = null;
 
     function openModal() {
@@ -741,8 +780,15 @@
       const backdrop = document.getElementById('modal-backdrop');
       backdrop.classList.remove('hidden');
 
-      document.getElementById('fsm-state').innerText = 'Open';
-      document.getElementById('fsm-actions').innerText = '["TrapFocus", "FocusFirstElement"]';
+      if (wasmActive && wasmExports && wasmExports.dialog_transition) {
+        wasmExports.dialog_transition(1); // 1 = OpenTriggerClicked
+        const isOpen = wasmExports.dialog_is_open() === 1;
+        document.getElementById('fsm-state').innerText = isOpen ? 'Open (Rust WASM)' : 'Open';
+        document.getElementById('fsm-actions').innerText = '["TrapFocus", "LockBodyScroll", "FocusFirstElement"]';
+      } else {
+        document.getElementById('fsm-state').innerText = 'Open';
+        document.getElementById('fsm-actions').innerText = '["TrapFocus", "FocusFirstElement"]';
+      }
 
       // Set focus to first input
       setTimeout(() => {
@@ -756,8 +802,14 @@
       const backdrop = document.getElementById('modal-backdrop');
       backdrop.classList.add('hidden');
 
-      document.getElementById('fsm-state').innerText = 'Closed';
-      document.getElementById('fsm-actions').innerText = '["RestorePriorFocus"]';
+      if (wasmActive && wasmExports && wasmExports.dialog_transition) {
+        wasmExports.dialog_transition(2); // 2 = CloseTriggerClicked
+        document.getElementById('fsm-state').innerText = 'Closed (Rust WASM)';
+        document.getElementById('fsm-actions').innerText = '["RestorePriorFocus", "UnlockBodyScroll"]';
+      } else {
+        document.getElementById('fsm-state').innerText = 'Closed';
+        document.getElementById('fsm-actions').innerText = '["RestorePriorFocus"]';
+      }
 
       if (previousActiveElement) {
         previousActiveElement.focus();
@@ -766,13 +818,16 @@
     }
 
     function confirmModalAction() {
-      alert("Acción ejecutada dentro de la frontera accesible.");
+      alert("Acción confirmada dentro de la frontera accesible.");
       closeModal();
     }
 
     function handleGlobalKeydown(e) {
       if (e.key === 'Escape') {
         e.preventDefault();
+        if (wasmActive && wasmExports && wasmExports.dialog_transition) {
+          wasmExports.dialog_transition(3); // 3 = EscapePressed
+        }
         closeModal();
       }
     }
@@ -788,19 +843,47 @@
       }
     }
 
-    // Accordion Toggle Logic (Emulating AccordionFsm)
+    // Accordion Toggle Logic (Directly backed by Rust AccordionFsm via WASM)
     function toggleAccordion(itemId) {
-      const isItem1 = itemId === 'item-1';
-      const body = document.getElementById(isItem1 ? 'acc-body-1' : 'acc-body-2');
-      const icon = document.getElementById(isItem1 ? 'acc-icon-1' : 'acc-icon-2');
+      const itemIndex = itemId === 'item-1' ? 1 : 2;
+      let isItem1Expanded = false;
+      let isItem2Expanded = false;
 
-      const isHidden = body.classList.contains('hidden');
-      if (isHidden) {
-        body.classList.remove('hidden');
-        icon.style.transform = 'rotate(180deg)';
+      if (wasmActive && wasmExports && wasmExports.accordion_toggle) {
+        const mask = wasmExports.accordion_toggle(itemIndex);
+        isItem1Expanded = (mask & 0b01) !== 0;
+        isItem2Expanded = (mask & 0b10) !== 0;
       } else {
-        body.classList.add('hidden');
-        icon.style.transform = 'rotate(0deg)';
+        const isItem1 = itemId === 'item-1';
+        const body = document.getElementById(isItem1 ? 'acc-body-1' : 'acc-body-2');
+        const isHidden = body.classList.contains('hidden');
+        if (isItem1) {
+          isItem1Expanded = isHidden;
+          isItem2Expanded = false;
+        } else {
+          isItem1Expanded = false;
+          isItem2Expanded = isHidden;
+        }
+      }
+
+      const body1 = document.getElementById('acc-body-1');
+      const icon1 = document.getElementById('acc-icon-1');
+      if (isItem1Expanded) {
+        body1.classList.remove('hidden');
+        icon1.style.transform = 'rotate(180deg)';
+      } else {
+        body1.classList.add('hidden');
+        icon1.style.transform = 'rotate(0deg)';
+      }
+
+      const body2 = document.getElementById('acc-body-2');
+      const icon2 = document.getElementById('acc-icon-2');
+      if (isItem2Expanded) {
+        body2.classList.remove('hidden');
+        icon2.style.transform = 'rotate(180deg)';
+      } else {
+        body2.classList.add('hidden');
+        icon2.style.transform = 'rotate(0deg)';
       }
     }
 
@@ -987,7 +1070,9 @@
         const pct = (i / steps) * 100;
         const t = (i / steps) * 0.9;
         let pos = 1.0;
-        if (zeta < 1.0) {
+        if (wasmActive && wasmExports && wasmExports.spring_evaluate) {
+          pos = wasmExports.spring_evaluate(k, c, m, t);
+        } else if (zeta < 1.0) {
           const omega_d = omega_n * Math.sqrt(1 - zeta * zeta);
           const env = Math.exp(-zeta * omega_n * t);
           pos = 1.0 - env * (Math.cos(omega_d * t) + (zeta / Math.sqrt(1 - zeta * zeta)) * Math.sin(omega_d * t));

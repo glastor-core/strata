@@ -4,6 +4,7 @@ members = [
     "crates/glastor-aria-core",
     "crates/glastor-css-binder",
     "crates/glastor-ui-cli",
+    "crates/glastor-aria-wasm",
     "examples/wasm-modal-demo",
 ]
 

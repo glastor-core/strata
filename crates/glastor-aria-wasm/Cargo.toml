@@ -1,0 +1,16 @@
+[package]
+name = "glastor-aria-wasm"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "WebAssembly runtime bridge for GLASTOR Strata headless accessibility FSMs and harmonic motion physics."
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+glastor-aria-core = { workspace = true }
