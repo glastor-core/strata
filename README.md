@@ -33,7 +33,8 @@ strata/
 │   ├── glastor-css-binder    Zero-Node CSS scanning, compilation and bundling engine for build.rs and dev-watch
 │   └── glastor-ui-cli        Decentralized component distributor and AST patcher for Cargo (cargo ui)
 ├── examples/
-│   └── wasm-modal-demo       Turnkey executable example validating build.rs CSS compilation & Wasm FSM
+│   ├── leptos-modal-demo     Minimal Leptos 0.7 CSR/WASM app with build.rs CSS & DOM ActionSink
+│   └── cli-fsm-demo          Turnkey CLI example validating build.rs CSS compilation & FSM
 ├── .byte-gauge.toml          byte-gauge SIMD vectorization & sub-microsecond Wasm footprint audit
 ├── .specter.toml             specter AST API Contract & SemVer diffing configuration
 ├── zerho.json                zerho Edge documentation (<15ms TTFB) & Deno Deploy configuration
@@ -98,6 +99,7 @@ assert!(actions.contains(&DialogAction::UnlockBodyScroll));
 
 ```rust
 // build.rs
+// Automatically emits `:root` design tokens (ThemeTokens::default()) and scanned utility rules.
 fn main() {
     glastor_css_binder::BuildBinder::new()
         .scan_dir("src")
@@ -138,13 +140,24 @@ cargo ui generate-llms
 
 ---
 
-## Running the Turnkey Example
+## Running the Examples
+
+### 1. Turnkey CLI & `build.rs` Demo
 
 ```bash
-cargo run -p wasm-modal-demo
+cargo run -p cli-fsm-demo
 ```
 
-Compiles the zero-Node CSS bundle automatically during `build.rs` and runs the FSM accessibility lifecycle.
+Compiles the zero-Node CSS bundle (including `:root` design tokens) automatically during `build.rs` and runs the FSM accessibility lifecycle.
+
+### 2. Leptos WASM Modal Demo
+
+```bash
+rustup target add wasm32-unknown-unknown
+cargo install trunk
+cd examples/leptos-modal-demo
+trunk serve --open
+```
 
 ---
 

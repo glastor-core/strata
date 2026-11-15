@@ -5,6 +5,8 @@
 //! only dismiss the topmost active layer rather than closing the entire application context.
 
 use crate::fsm::{StateMachine, TransitionResult};
+use alloc::vec;
+use alloc::vec::Vec;
 
 /// Global or tree-level layer stack identifier.
 pub type LayerId = u64;

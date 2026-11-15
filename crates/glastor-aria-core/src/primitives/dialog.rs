@@ -9,6 +9,10 @@ use crate::primitives::dismissable::{DismissableAction, DismissableEvent, Dismis
 use crate::primitives::focus_trap::{
     FocusTrapAction, FocusTrapEvent, FocusTrapFsm, SentinelBoundary,
 };
+use alloc::format;
+use alloc::string::String;
+use alloc::vec;
+use alloc::vec::Vec;
 
 /// High-level events for a headless dialog.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -42,6 +46,36 @@ pub enum DialogAction {
     LockBodyScroll,
     /// Unlock body scroll when dialog is dismissed.
     UnlockBodyScroll,
+}
+
+/// High-level DOM operation mapped from a [`DialogAction`].
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum DomDialogEffect<'a> {
+    /// Call `.focus()` on the DOM element with the given `id`.
+    FocusById(&'a str),
+    /// Set `document.body.style.overflow` to the given CSS value (`"hidden"` or `""`).
+    SetBodyOverflow(&'static str),
+    /// No direct DOM attribute/focus mutation required.
+    None,
+}
+
+impl DialogAction {
+    /// Maps a [`DialogAction`] into a concrete [`DomDialogEffect`] using the trigger and initial focus element IDs.
+    pub fn to_dom_effect<'a>(
+        &self,
+        trigger_id: &'a str,
+        initial_focus_id: &'a str,
+    ) -> DomDialogEffect<'a> {
+        match self {
+            Self::TrapFocus | Self::FocusFirstElement | Self::FocusLastElement => {
+                DomDialogEffect::FocusById(initial_focus_id)
+            }
+            Self::RestorePriorFocus => DomDialogEffect::FocusById(trigger_id),
+            Self::LockBodyScroll => DomDialogEffect::SetBodyOverflow("hidden"),
+            Self::UnlockBodyScroll => DomDialogEffect::SetBodyOverflow(""),
+            Self::PreventDefault => DomDialogEffect::None,
+        }
+    }
 }
 
 /// State of the dialog.

@@ -8,6 +8,7 @@
 
 use crate::attributes::{AriaAttributes, AriaRole};
 use crate::fsm::{StateMachine, TransitionResult};
+use alloc::vec::Vec;
 
 /// 2D Coordinate of a focused or selected cell in the grid (row, col).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -133,9 +134,17 @@ impl VirtualGridFsm {
         }
 
         let total_height = total_rows as f32 * row_height;
-        let computed_row_index = (scroll_y / row_height).floor() as u32;
+        #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+        let computed_row_index = (scroll_y.max(0.0) / row_height) as u32;
         let start_row = computed_row_index.saturating_sub(overscan);
-        let visible_count = (viewport_height / row_height).ceil() as u32;
+        let ratio = viewport_height.max(0.0) / row_height;
+        #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+        let trunc = ratio as u32;
+        let visible_count = if (trunc as f32) < ratio {
+            trunc.saturating_add(1)
+        } else {
+            trunc
+        };
         let end_row = (computed_row_index + visible_count + overscan).min(total_rows);
         let offset_y = start_row as f32 * row_height;
 

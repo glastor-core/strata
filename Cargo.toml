@@ -5,8 +5,9 @@ members = [
     "crates/glastor-css-binder",
     "crates/glastor-ui-cli",
     "crates/glastor-aria-wasm",
-    "examples/wasm-modal-demo",
+    "examples/cli-fsm-demo",
 ]
+exclude = ["examples/leptos-modal-demo"]
 
 [workspace.package]
 version = "0.1.0"
@@ -56,5 +57,3 @@ cargo_common_metadata = "allow"
 doc_markdown = "allow"
 missing_errors_doc = "allow"
 missing_panics_doc = "allow"
-assert_is_empty = "allow"
-manual_assert_eq = "allow"

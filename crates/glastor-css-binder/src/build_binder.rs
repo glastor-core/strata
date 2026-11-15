@@ -4,7 +4,7 @@
 //! scanning project directories, generating atomic CSS, and emitting Cargo rerun directives.
 
 use crate::minifier::CssMinifier;
-use crate::rules::RulesEngine;
+use crate::rules::{RulesEngine, ThemeTokens};
 use crate::scanner::{ScanError, SourceScanner};
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -29,6 +29,7 @@ pub enum BuildBinderError {
 pub struct BuildBinder {
     scan_dirs: Vec<PathBuf>,
     output_path: Option<PathBuf>,
+    theme_tokens: Option<ThemeTokens>,
     base_css: Option<String>,
     minify: bool,
     emit_cargo_rerun: bool,
@@ -39,6 +40,7 @@ impl Default for BuildBinder {
         Self {
             scan_dirs: vec![PathBuf::from("src")],
             output_path: None,
+            theme_tokens: Some(ThemeTokens::default()),
             base_css: None,
             minify: true,
             emit_cargo_rerun: true,
@@ -52,15 +54,30 @@ impl BuildBinder {
         Self::default()
     }
 
-    /// Adds a directory to scan for utility class usages.
+    /// Adds a directory to scan for utility class usages (deduplicated).
     pub fn scan_dir(mut self, dir: impl AsRef<Path>) -> Self {
-        self.scan_dirs.push(dir.as_ref().to_path_buf());
+        let path = dir.as_ref().to_path_buf();
+        if !self.scan_dirs.contains(&path) {
+            self.scan_dirs.push(path);
+        }
         self
     }
 
     /// Sets the destination path for the compiled CSS bundle.
     pub fn output_css(mut self, path: impl AsRef<Path>) -> Self {
         self.output_path = Some(path.as_ref().to_path_buf());
+        self
+    }
+
+    /// Injects custom `:root` theme variables into the generated bundle (enabled by default with `ThemeTokens::default()`).
+    pub fn with_theme_tokens(mut self, tokens: ThemeTokens) -> Self {
+        self.theme_tokens = Some(tokens);
+        self
+    }
+
+    /// Disables automatic `:root` theme variable injection.
+    pub fn without_theme_tokens(mut self) -> Self {
+        self.theme_tokens = None;
         self
     }
 
@@ -108,6 +125,11 @@ impl BuildBinder {
 
         let rules_engine = RulesEngine::new();
         let mut stylesheet = String::new();
+
+        if let Some(ref tokens) = self.theme_tokens {
+            stylesheet.push_str(&tokens.to_css());
+            stylesheet.push('\n');
+        }
 
         if let Some(ref base) = self.base_css {
             stylesheet.push_str(base);

@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
   Script de publicación ordenada para el workspace GLASTOR® Strata en crates.io.
 
@@ -32,8 +32,7 @@ if ($DryRun) {
     Write-Host "[MODO] Dry-Run activo (simulación sin publicación real)" -ForegroundColor Yellow
     $extraArgs += "--dry-run"
 } elseif ($Token) {
-    $extraArgs += "--token"
-    $extraArgs += $Token.Trim()
+    $env:CARGO_REGISTRY_TOKEN = $Token.Trim()
 } else {
     $hasCredentials = (Test-Path "$env:USERPROFILE\.cargo\credentials.toml") -or (Test-Path "$env:USERPROFILE\.cargo\credentials")
     if (-not $hasCredentials) {
@@ -44,9 +43,7 @@ if ($DryRun) {
             Write-Host "Operación cancelada. Ejecuta: .\scripts\publish-crates.ps1 -Token 'TU_TOKEN'" -ForegroundColor Red
             exit 1
         }
-        $Token = $inputToken.Trim()
-        $extraArgs += "--token"
-        $extraArgs += $Token
+        $env:CARGO_REGISTRY_TOKEN = $inputToken.Trim()
     }
 }
 

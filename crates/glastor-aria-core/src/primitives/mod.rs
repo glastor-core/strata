@@ -14,7 +14,7 @@ pub use accordion::{
     AccordionAction, AccordionEvent, AccordionFsm, AccordionItemId, AccordionMode,
     AccordionNavDirection, AccordionState,
 };
-pub use dialog::{DialogAction, DialogEvent, DialogFsm, DialogState};
+pub use dialog::{DialogAction, DialogEvent, DialogFsm, DialogState, DomDialogEffect};
 pub use dismissable::{
     DismissableAction, DismissableEvent, DismissableFsm, DismissableStack, DismissableState,
     LayerId,

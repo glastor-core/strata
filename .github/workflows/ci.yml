@@ -35,11 +35,27 @@ jobs:
       - name: Clippy Linter
         run: cargo clippy --workspace --all-targets --all-features
 
+      - name: Verify no_std Support (glastor-aria-core)
+        run: cargo check -p glastor-aria-core --no-default-features
+
       - name: Run Tests
         run: cargo test --workspace --all-features --verbose
 
       - name: Documentation Build
         run: cargo doc --workspace --no-deps --all-features
+
+  wasm-leptos-example:
+    name: Leptos WASM Example Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+      - name: Check examples/leptos-modal-demo (wasm32-unknown-unknown)
+        run: cargo check --manifest-path examples/leptos-modal-demo/Cargo.toml --target wasm32-unknown-unknown
 
   glastor-ecosystem-audit:
     name: GLASTOR® Core Audit (byte-gauge, specter, zerho)

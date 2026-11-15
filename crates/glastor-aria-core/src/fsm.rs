@@ -3,6 +3,7 @@
 //! Provides the foundational contracts for event-driven, framework-agnostic
 //! UI behavior and DOM action emission.
 
+use alloc::vec::Vec;
 use core::fmt::Debug;
 
 /// Result of an FSM state transition.

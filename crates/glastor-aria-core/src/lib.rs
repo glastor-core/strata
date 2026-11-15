@@ -5,8 +5,11 @@
 //!
 //! Part of the **GLASTOR® Core** infrastructure suite.
 
+#![cfg_attr(not(feature = "std"), no_std)]
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
+
+extern crate alloc;
 
 pub mod adapter;
 pub mod attributes;

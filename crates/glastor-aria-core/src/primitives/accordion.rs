@@ -8,7 +8,10 @@
 
 use crate::attributes::{AriaAttributes, AriaRole};
 use crate::fsm::{StateMachine, TransitionResult};
-use std::collections::HashSet;
+use alloc::collections::BTreeSet;
+use alloc::format;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// Accordion item identifier.
 pub type AccordionItemId = String;
@@ -62,7 +65,7 @@ pub enum AccordionAction {
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct AccordionState {
     /// Currently expanded items.
-    pub expanded_items: HashSet<AccordionItemId>,
+    pub expanded_items: BTreeSet<AccordionItemId>,
     /// Ordered list of item IDs.
     pub items: Vec<AccordionItemId>,
     /// Index of the currently focused header.
@@ -82,7 +85,7 @@ impl AccordionFsm {
     pub fn new(items: Vec<AccordionItemId>, mode: AccordionMode) -> Self {
         Self {
             state: AccordionState {
-                expanded_items: HashSet::new(),
+                expanded_items: BTreeSet::new(),
                 items,
                 focused_index: None,
             },
@@ -149,7 +152,7 @@ impl StateMachine for AccordionFsm {
                     }
                 } else {
                     if self.mode == AccordionMode::Single {
-                        for prev_id in next_state.expanded_items.drain() {
+                        for prev_id in core::mem::take(&mut next_state.expanded_items) {
                             actions.push(AccordionAction::ItemCollapsed(prev_id));
                         }
                     }

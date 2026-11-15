@@ -8,7 +8,6 @@ use std::fs;
 use tempfile::tempdir;
 
 #[test]
-#[allow(clippy::assert_is_empty)]
 fn test_cli_add_component_and_mod_rs() {
     let dir = tempdir().expect("tempdir creation");
     let components_dir = dir.path().join("src").join("components").join("ui");
@@ -115,7 +114,6 @@ fn test_security_path_traversal_prevention() {
 }
 
 #[test]
-#[allow(clippy::assert_is_empty)]
 fn test_accessibility_linter_diagnostics() {
     use glastor_ui_cli::linter::{AccessibilityLinter, DiagnosticLevel};
     use std::path::Path;
@@ -168,4 +166,67 @@ fn test_css_watcher_cycle() {
     // Subsequent check without edits should not recompile
     let recompiled_second = watcher.check_and_recompile().expect("watcher check 2");
     assert!(!recompiled_second);
+}
+
+#[test]
+fn test_canonical_registry_css_extraction_and_resolution() {
+    use glastor_css_binder::{BuildBinder, RulesEngine, SourceScanner};
+
+    let dir = tempdir().expect("tempdir");
+    let components_dir = dir.path().join("src").join("components").join("ui");
+    let out_css = dir.path().join("dist").join("style.min.css");
+
+    let manifest = RegistryLoader::load_manifest(None).expect("load manifest");
+    for comp in manifest.components.values() {
+        ComponentInjector::inject_component(comp, &components_dir).expect("inject component");
+    }
+
+    let scanner = SourceScanner::new();
+    let extracted_classes = scanner
+        .scan_directory(&components_dir)
+        .expect("scan injected components");
+
+    // Verify key classes from the 7 canonical components are extracted and resolved
+    let expected_classes = [
+        "bg-primary",
+        "text-primary-foreground",
+        "bg-opacity-50",
+        "mt-2",
+        "w-72",
+        "py-1.5",
+        "whitespace-nowrap",
+        "disabled:pointer-events-none",
+        "disabled:opacity-50",
+        "flex-col-reverse",
+        "space-x-4",
+        "animate-spring-bounce",
+        "bg-card",
+        "transition-colors",
+        "h-10",
+        "focus:ring-ring",
+    ];
+
+    for expected in expected_classes {
+        assert!(
+            extracted_classes.iter().any(|c| c == expected),
+            "Scanner missed canonical component class '{expected}'"
+        );
+        assert!(
+            RulesEngine::resolve_entry(expected).is_some(),
+            "RulesEngine failed to resolve canonical component class '{expected}'"
+        );
+    }
+
+    BuildBinder::new()
+        .scan_dir(&components_dir)
+        .output_css(&out_css)
+        .with_cargo_rerun(false)
+        .compile()
+        .expect("compile canonical components CSS");
+
+    let css = fs::read_to_string(&out_css).expect("read compiled CSS");
+    assert!(css.contains(":root{"));
+    assert!(css.contains(".mt-2{margin-top:0.5rem;}"));
+    assert!(css.contains(".w-72{width:18rem;}"));
+    assert!(css.contains(".h-10{height:2.5rem;}"));
 }

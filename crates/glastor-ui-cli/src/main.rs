@@ -117,7 +117,12 @@ struct LintA11yArgs {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let cli = Cli::parse();
+    // When invoked as a Cargo subcommand (`cargo ui <cmd>`), Cargo passes `"ui"` as argv[1].
+    let mut raw_args: Vec<String> = std::env::args().collect();
+    if raw_args.get(1).map(String::as_str) == Some("ui") {
+        raw_args.remove(1);
+    }
+    let cli = Cli::parse_from(raw_args);
     let config = GlastorUiConfig::load_or_default();
 
     match cli.command {

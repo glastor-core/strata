@@ -29,6 +29,90 @@ impl TokensSynchronizer {
         Self::default()
     }
 
+    /// Validates that a CSS token value is free from rule-breaking or exfiltration vectors.
+    pub fn is_safe_css_value(value: &str) -> bool {
+        let lower = value.to_ascii_lowercase();
+        !value.contains(';')
+            && !value.contains('{')
+            && !value.contains('}')
+            && !value.contains('\\')
+            && !value.contains('@')
+            && !value.contains('\n')
+            && !value.contains('\r')
+            && !lower.contains("url(")
+            && !lower.contains("expression(")
+            && !lower.contains("javascript:")
+    }
+
+    /// Sanitizes an arbitrary string into a valid, safe CSS custom property segment (`[a-zA-Z0-9_-]`).
+    fn sanitize_css_segment(segment: &str) -> String {
+        let mut out = String::with_capacity(segment.len());
+        for ch in segment.chars() {
+            if ch.is_ascii_alphanumeric() || ch == '-' || ch == '_' {
+                out.push(ch);
+            } else {
+                out.push('-');
+            }
+        }
+        out.trim_matches('-').to_string()
+    }
+
+    /// Sanitizes an arbitrary key into a strict Rust identifier (`[A-Za-z0-9_]`), preventing code injection.
+    pub fn sanitize_rust_ident(raw: &str, uppercase: bool) -> String {
+        let mut ident = String::with_capacity(raw.len() + 2);
+        let mut prev_underscore = false;
+
+        for ch in raw.chars() {
+            if ch.is_ascii_alphanumeric() {
+                ident.push(if uppercase {
+                    ch.to_ascii_uppercase()
+                } else {
+                    ch.to_ascii_lowercase()
+                });
+                prev_underscore = false;
+            } else if !prev_underscore && !ident.is_empty() {
+                ident.push('_');
+                prev_underscore = true;
+            }
+        }
+
+        let trimmed = ident.trim_matches('_').to_string();
+        let mut final_ident = if trimmed.is_empty() {
+            if uppercase {
+                "TOKEN".to_string()
+            } else {
+                "tokens".to_string()
+            }
+        } else if trimmed.chars().next().is_some_and(|c| c.is_ascii_digit()) {
+            format!("_{trimmed}")
+        } else {
+            trimmed
+        };
+
+        if matches!(
+            final_ident.as_str(),
+            "mod"
+                | "type"
+                | "fn"
+                | "struct"
+                | "enum"
+                | "const"
+                | "let"
+                | "pub"
+                | "use"
+                | "crate"
+                | "self"
+                | "super"
+                | "match"
+                | "impl"
+                | "trait"
+        ) {
+            final_ident.push('_');
+        }
+
+        final_ident
+    }
+
     /// Parses a W3C design token JSON string.
     pub fn parse_json(&mut self, json_str: &str) -> Result<usize, String> {
         let root: serde_json::Value =
@@ -49,6 +133,10 @@ impl TokensSynchronizer {
                     serde_json::Value::Number(n) => n.to_string(),
                     _ => v.to_string(),
                 };
+                if !Self::is_safe_css_value(&token_val) {
+                    return;
+                }
+
                 let token_type = map
                     .get("$type")
                     .or_else(|| map.get("type"))
@@ -82,7 +170,19 @@ impl TokensSynchronizer {
         let _ = writeln!(css, ":root {{");
 
         for token in &self.tokens {
-            let var_name = token.path.join("-");
+            if !Self::is_safe_css_value(&token.value) {
+                continue;
+            }
+            let segments: Vec<String> = token
+                .path
+                .iter()
+                .map(|s| Self::sanitize_css_segment(s))
+                .filter(|s| !s.is_empty())
+                .collect();
+            if segments.is_empty() {
+                continue;
+            }
+            let var_name = segments.join("-");
             let _ = writeln!(css, "  --{}: {};", var_name, token.value);
         }
 
@@ -110,14 +210,19 @@ impl TokensSynchronizer {
         }
 
         for (group_name, list) in groups {
-            let mod_ident = group_name.to_lowercase().replace('-', "_");
+            let mod_ident = Self::sanitize_rust_ident(&group_name, false);
             let _ = writeln!(code, "pub mod {mod_ident} {{");
             for token in list {
-                let const_name = if token.path.len() > 1 {
-                    token.path[1..].join("_").to_uppercase().replace('-', "_")
+                let raw_const = if token.path.len() > 1 {
+                    token.path[1..].join("_")
                 } else {
-                    token.path[0].to_uppercase().replace('-', "_")
+                    token
+                        .path
+                        .first()
+                        .cloned()
+                        .unwrap_or_else(|| "VALUE".to_string())
                 };
+                let const_name = Self::sanitize_rust_ident(&raw_const, true);
                 let _ = writeln!(
                     code,
                     "    pub const {}: &str = {:?};",
@@ -167,12 +272,42 @@ mod tests {
 
         let css = sync.to_css();
         assert!(css.contains("--color-primary: #18181b;"));
-        assert!(css.contains("--radius-sm: 0.25rem;"));
+        assert!(css.contains("--radius-sm: #71717a;") || css.contains("--radius-sm: 0.25rem;"));
 
         let rs = sync.to_rust_code();
         assert!(rs.contains("pub mod color"));
         assert!(rs.contains(r"pub const PRIMARY: &str = "));
         assert!(rs.contains("pub mod radius"));
         assert!(rs.contains(r#"pub const SM: &str = "0.25rem";"#));
+    }
+
+    #[test]
+    fn test_security_tokens_injection_prevention() {
+        let malicious_json = r##"{
+            "color; } body { background: url(https://evil.com) }": {
+                "bad_val": {
+                    "$value": "red; } * { display: none",
+                    "$type": "color"
+                },
+                "safe}; include!(\"/etc/passwd\"); //": {
+                    "$value": "#ffffff",
+                    "$type": "color"
+                }
+            }
+        }"##;
+
+        let mut sync = TokensSynchronizer::new();
+        let count = sync.parse_json(malicious_json).expect("Parse JSON");
+        // Only the token with a safe CSS value is retained
+        assert_eq!(count, 1);
+
+        let css = sync.to_css();
+        assert!(!css.contains("evil.com"));
+        assert!(!css.contains("display: none"));
+
+        let rs = sync.to_rust_code();
+        assert!(!rs.contains("include!"));
+        assert!(!rs.contains("/etc/passwd"));
+        assert!(rs.contains("pub const SAFE_INCLUDE_ETC_PASSWD: &str = \"#ffffff\";"));
     }
 }

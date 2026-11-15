@@ -7,6 +7,9 @@
 
 use crate::attributes::{AriaAttributes, AriaHasPopup, AriaRole};
 use crate::fsm::{StateMachine, TransitionResult};
+use alloc::string::String;
+use alloc::vec;
+use alloc::vec::Vec;
 
 /// Interaction trigger type.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]

@@ -9,6 +9,9 @@
 
 use crate::attributes::{AriaAttributes, AriaOrientation, AriaRole};
 use crate::fsm::{StateMachine, TransitionResult};
+use alloc::format;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// Identifier for a tab.
 pub type TabId = String;

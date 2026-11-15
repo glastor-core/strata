@@ -150,7 +150,9 @@ impl RulesEngine {
 
             // Flexbox alignments
             "flex-col" => return Some("flex-direction: column;".into()),
+            "flex-col-reverse" => return Some("flex-direction: column-reverse;".into()),
             "flex-row" => return Some("flex-direction: row;".into()),
+            "flex-row-reverse" => return Some("flex-direction: row-reverse;".into()),
             "items-center" => return Some("align-items: center;".into()),
             "items-start" => return Some("align-items: flex-start;".into()),
             "items-end" => return Some("align-items: flex-end;".into()),
@@ -165,6 +167,10 @@ impl RulesEngine {
             "fixed" => return Some("position: fixed;".into()),
             "sticky" => return Some("position: sticky;".into()),
             "inset-0" => return Some("top: 0; right: 0; bottom: 0; left: 0;".into()),
+            "top-0" => return Some("top: 0px;".into()),
+            "right-0" => return Some("right: 0px;".into()),
+            "bottom-0" => return Some("bottom: 0px;".into()),
+            "left-0" => return Some("left: 0px;".into()),
 
             // Sizing
             "w-full" => return Some("width: 100%;".into()),
@@ -173,6 +179,7 @@ impl RulesEngine {
             "h-full" => return Some("height: 100%;".into()),
             "h-screen" => return Some("height: 100vh;".into()),
             "min-h-screen" => return Some("min-height: 100vh;".into()),
+            "max-h-screen" => return Some("max-height: 100vh;".into()),
 
             // Text alignments & Weights
             "text-center" => return Some("text-align: center;".into()),
@@ -230,9 +237,15 @@ impl RulesEngine {
             "max-w-6xl" => return Some("max-width: 72rem;".into()),
             "max-w-3xl" => return Some("max-width: 48rem;".into()),
             "max-w-md" => return Some("max-width: 28rem;".into()),
+            "overflow-auto" => return Some("overflow: auto;".into()),
             "overflow-hidden" => return Some("overflow: hidden;".into()),
             "overflow-y-auto" => return Some("overflow-y: auto;".into()),
             "overflow-x-auto" => return Some("overflow-x: auto;".into()),
+            "whitespace-nowrap" => return Some("white-space: nowrap;".into()),
+            "pointer-events-none" => return Some("pointer-events: none;".into()),
+            "opacity-0" => return Some("opacity: 0;".into()),
+            "opacity-50" | "bg-opacity-50" => return Some("opacity: 0.5;".into()),
+            "opacity-100" => return Some("opacity: 1;".into()),
             "z-50" => return Some("z-index: 50;".into()),
             "backdrop-blur-sm" => return Some("backdrop-filter: blur(4px);".into()),
 
@@ -251,7 +264,11 @@ impl RulesEngine {
 
             // Theme Variables mapping
             "bg-background" => return Some("background-color: var(--background);".into()),
+            "bg-card" => return Some("background-color: var(--card, var(--background));".into()),
             "text-foreground" => return Some("color: var(--foreground);".into()),
+            "text-card-foreground" => {
+                return Some("color: var(--card-foreground, var(--foreground));".into())
+            }
             "bg-primary" => return Some("background-color: var(--primary);".into()),
             "text-primary-foreground" => {
                 return Some("color: var(--primary-foreground);".into())
@@ -259,6 +276,7 @@ impl RulesEngine {
             "bg-muted" => return Some("background-color: var(--muted);".into()),
             "text-muted-foreground" => return Some("color: var(--muted-foreground);".into()),
             "border-border" => return Some("border-color: var(--border);".into()),
+            "ring-ring" => return Some("--ring-color: var(--ring);".into()),
 
             // Common Theme Colors
             "bg-transparent" => return Some("background-color: transparent;".into()),
@@ -278,6 +296,9 @@ impl RulesEngine {
             "cursor-not-allowed" => return Some("cursor: not-allowed;".into()),
             "transition-all" => return Some(
                 "transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms;".into()
+            ),
+            "transition-colors" => return Some(
+                "transition-property: color, background-color, border-color; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms;".into()
             ),
 
             // Spring Physics Animations (GPU Compositor Rendered)
@@ -305,6 +326,26 @@ impl RulesEngine {
                 return Some(format!("padding-top: {val}; padding-bottom: {val};"));
             }
         }
+        if let Some(rest) = class.strip_prefix("pt-") {
+            if let Some(val) = Self::resolve_spacing_scale(rest) {
+                return Some(format!("padding-top: {val};"));
+            }
+        }
+        if let Some(rest) = class.strip_prefix("pb-") {
+            if let Some(val) = Self::resolve_spacing_scale(rest) {
+                return Some(format!("padding-bottom: {val};"));
+            }
+        }
+        if let Some(rest) = class.strip_prefix("pl-") {
+            if let Some(val) = Self::resolve_spacing_scale(rest) {
+                return Some(format!("padding-left: {val};"));
+            }
+        }
+        if let Some(rest) = class.strip_prefix("pr-") {
+            if let Some(val) = Self::resolve_spacing_scale(rest) {
+                return Some(format!("padding-right: {val};"));
+            }
+        }
         if let Some(rest) = class.strip_prefix("m-") {
             if rest == "auto" {
                 return Some("margin: auto;".into());
@@ -326,9 +367,49 @@ impl RulesEngine {
                 return Some(format!("margin-top: {val}; margin-bottom: {val};"));
             }
         }
+        if let Some(rest) = class.strip_prefix("mt-") {
+            if let Some(val) = Self::resolve_spacing_scale(rest) {
+                return Some(format!("margin-top: {val};"));
+            }
+        }
+        if let Some(rest) = class.strip_prefix("mb-") {
+            if let Some(val) = Self::resolve_spacing_scale(rest) {
+                return Some(format!("margin-bottom: {val};"));
+            }
+        }
+        if let Some(rest) = class.strip_prefix("ml-") {
+            if let Some(val) = Self::resolve_spacing_scale(rest) {
+                return Some(format!("margin-left: {val};"));
+            }
+        }
+        if let Some(rest) = class.strip_prefix("mr-") {
+            if let Some(val) = Self::resolve_spacing_scale(rest) {
+                return Some(format!("margin-right: {val};"));
+            }
+        }
         if let Some(rest) = class.strip_prefix("gap-") {
             if let Some(val) = Self::resolve_spacing_scale(rest) {
                 return Some(format!("gap: {val};"));
+            }
+        }
+        if let Some(rest) = class.strip_prefix("space-x-") {
+            if let Some(val) = Self::resolve_spacing_scale(rest) {
+                return Some(format!("column-gap: {val};"));
+            }
+        }
+        if let Some(rest) = class.strip_prefix("space-y-") {
+            if let Some(val) = Self::resolve_spacing_scale(rest) {
+                return Some(format!("row-gap: {val};"));
+            }
+        }
+        if let Some(rest) = class.strip_prefix("w-") {
+            if let Some(val) = Self::resolve_spacing_scale(rest) {
+                return Some(format!("width: {val};"));
+            }
+        }
+        if let Some(rest) = class.strip_prefix("h-") {
+            if let Some(val) = Self::resolve_spacing_scale(rest) {
+                return Some(format!("height: {val};"));
             }
         }
 
@@ -354,17 +435,34 @@ impl RulesEngine {
     fn resolve_spacing_scale(key: &str) -> Option<&'static str> {
         match key {
             "0" => Some("0px"),
+            "0.5" => Some("0.125rem"),
             "1" => Some("0.25rem"),
+            "1.5" => Some("0.375rem"),
             "2" => Some("0.5rem"),
+            "2.5" => Some("0.625rem"),
             "3" => Some("0.75rem"),
+            "3.5" => Some("0.875rem"),
             "4" => Some("1rem"),
             "5" => Some("1.25rem"),
             "6" => Some("1.5rem"),
+            "7" => Some("1.75rem"),
             "8" => Some("2rem"),
+            "9" => Some("2.25rem"),
             "10" => Some("2.5rem"),
+            "11" => Some("2.75rem"),
             "12" => Some("3rem"),
+            "14" => Some("3.5rem"),
             "16" => Some("4rem"),
             "20" => Some("5rem"),
+            "24" => Some("6rem"),
+            "32" => Some("8rem"),
+            "40" => Some("10rem"),
+            "48" => Some("12rem"),
+            "56" => Some("14rem"),
+            "64" => Some("16rem"),
+            "72" => Some("18rem"),
+            "80" => Some("20rem"),
+            "96" => Some("24rem"),
             _ => None,
         }
     }

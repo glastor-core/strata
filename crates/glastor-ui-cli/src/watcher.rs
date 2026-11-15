@@ -42,7 +42,7 @@ impl CssWatcher {
     /// Returns `true` if a recompilation was triggered.
     pub fn check_and_recompile(&mut self) -> Result<bool, Box<dyn std::error::Error>> {
         let mut current_snapshots = HashMap::new();
-        Self::collect_snapshots(&self.scan_dir, &mut current_snapshots)?;
+        Self::collect_snapshots(&self.scan_dir, &mut current_snapshots, 0)?;
 
         let has_changed = current_snapshots != self.file_snapshots;
 
@@ -89,14 +89,19 @@ impl CssWatcher {
     fn collect_snapshots(
         current: &Path,
         snapshots: &mut HashMap<PathBuf, SystemTime>,
+        depth: usize,
     ) -> Result<(), std::io::Error> {
-        if !current.exists() {
+        if depth > 32 || !current.exists() {
             return Ok(());
         }
 
         if current.is_dir() {
             for entry in fs::read_dir(current)? {
                 let entry = entry?;
+                let file_type = entry.file_type()?;
+                if file_type.is_symlink() {
+                    continue;
+                }
                 let path = entry.path();
                 if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
                     if name.starts_with('.')
@@ -107,7 +112,7 @@ impl CssWatcher {
                         continue;
                     }
                 }
-                Self::collect_snapshots(&path, snapshots)?;
+                Self::collect_snapshots(&path, snapshots, depth + 1)?;
             }
         } else if let Some(ext) = current.extension().and_then(|e| e.to_str()) {
             if matches!(ext, "rs" | "rsx" | "html") {

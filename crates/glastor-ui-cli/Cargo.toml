@@ -34,3 +34,7 @@ glastor-css-binder = { workspace = true }
 
 [dev-dependencies]
 tempfile = "3.17.1"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

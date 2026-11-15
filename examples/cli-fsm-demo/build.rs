@@ -1,4 +1,4 @@
-//! Zero-Node.js CSS bundling build script for wasm-modal-demo.
+//! Zero-Node.js CSS bundling build script for cli-fsm-demo.
 
 fn main() {
     glastor_css_binder::BuildBinder::new()

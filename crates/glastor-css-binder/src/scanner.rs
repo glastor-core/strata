@@ -8,7 +8,24 @@ use regex::Regex;
 use std::collections::HashSet;
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::sync::OnceLock;
 use thiserror::Error;
+
+/// Maximum directory recursion depth to guard against deep or cyclic trees.
+const MAX_SCAN_DEPTH: usize = 32;
+
+fn attr_regex() -> &'static Regex {
+    static REGEX: OnceLock<Regex> = OnceLock::new();
+    REGEX.get_or_init(|| {
+        Regex::new(r#"(?:class|className|classes!)\s*(?:=|:|\()\s*["']([^"']+)["']"#)
+            .expect("Valid static attribute regex")
+    })
+}
+
+fn literal_regex() -> &'static Regex {
+    static REGEX: OnceLock<Regex> = OnceLock::new();
+    REGEX.get_or_init(|| Regex::new(r#""([^"\\]+)""#).expect("Valid static literal regex"))
+}
 
 /// Errors that may occur during source scanning.
 #[derive(Debug, Error)]
@@ -58,41 +75,54 @@ impl SourceScanner {
         if !base_dir.exists() {
             return Ok(files);
         }
-        self.walk_dir_recursive(base_dir, &mut files)?;
+        self.walk_dir_recursive(base_dir, &mut files, 0)?;
         Ok(files)
     }
 
-    fn walk_dir_recursive(&self, dir: &Path, acc: &mut Vec<PathBuf>) -> Result<(), ScanError> {
-        if dir.is_dir() {
-            for entry in fs::read_dir(dir)? {
-                let entry = entry?;
-                let path = entry.path();
-                if path.is_dir() {
-                    let dir_name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
-                    // Skip hidden directories and target builds
-                    if !dir_name.starts_with('.')
-                        && dir_name != "target"
-                        && dir_name != "node_modules"
-                    {
-                        self.walk_dir_recursive(&path, acc)?;
-                    }
-                } else if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
-                    if self.extensions.iter().any(|target_ext| target_ext == ext) {
-                        acc.push(path);
-                    }
+    fn walk_dir_recursive(
+        &self,
+        dir: &Path,
+        acc: &mut Vec<PathBuf>,
+        depth: usize,
+    ) -> Result<(), ScanError> {
+        if depth > MAX_SCAN_DEPTH || !dir.is_dir() {
+            return Ok(());
+        }
+
+        for entry in fs::read_dir(dir)? {
+            let entry = entry?;
+            let file_type = entry.file_type()?;
+            // Ignore symlinks to prevent directory traversal loops (CWE-674)
+            if file_type.is_symlink() {
+                continue;
+            }
+
+            let path = entry.path();
+            if file_type.is_dir() {
+                let dir_name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
+                // Skip hidden directories and target builds
+                if !dir_name.starts_with('.') && dir_name != "target" && dir_name != "node_modules"
+                {
+                    self.walk_dir_recursive(&path, acc, depth + 1)?;
                 }
+            } else if file_type.is_file()
+                && let Some(ext) = path.extension().and_then(|e| e.to_str())
+                && self.extensions.iter().any(|target_ext| target_ext == ext)
+            {
+                acc.push(path);
             }
         }
         Ok(())
     }
 
     /// Scans a single string for utility class tokens.
+    ///
+    /// Extracts classes from explicit `class` / `className` / `classes!()` attributes as well as
+    /// Rust string literals (e.g. `pub const OVERLAY: &str = "..."` in component libraries) whose
+    /// tokens resolve to known utility rules in [`crate::rules::RulesEngine`].
     pub fn scan_string(&self, content: &str) -> HashSet<String> {
-        let pattern = Regex::new(r#"(?:class|className|classes!)\s*(?:=|:|\()\s*["']([^"']+)["']"#)
-            .expect("Valid static regex");
-
         let mut classes = HashSet::new();
-        for cap in pattern.captures_iter(content) {
+        for cap in attr_regex().captures_iter(content) {
             if let Some(matched) = cap.get(1) {
                 for token in matched.as_str().split_whitespace() {
                     let clean = token.trim();
@@ -102,26 +132,36 @@ impl SourceScanner {
                 }
             }
         }
+
+        for cap in literal_regex().captures_iter(content) {
+            if let Some(matched) = cap.get(1) {
+                for token in matched.as_str().split_whitespace() {
+                    let clean = token.trim();
+                    if !clean.is_empty()
+                        && crate::rules::RulesEngine::resolve_entry(clean).is_some()
+                    {
+                        classes.insert(clean.to_string());
+                    }
+                }
+            }
+        }
+
         classes
     }
 
-    /// Scans a directory of files in parallel, returning all unique utility class tokens found.
-    pub fn scan_directory(&self, base_dir: &Path) -> Result<HashSet<String>, ScanError> {
+    /// Scans all eligible files in a directory in parallel using `rayon`, returning a deduplicated
+    /// sorted list of utility class tokens.
+    pub fn scan_directory(&self, base_dir: &Path) -> Result<Vec<String>, ScanError> {
         let files = self.collect_files(base_dir)?;
 
-        let classes = files
+        let combined: HashSet<String> = files
             .par_iter()
-            .map(|path| -> HashSet<String> {
-                match fs::read_to_string(path) {
-                    Ok(content) => self.scan_string(&content),
-                    Err(_) => HashSet::new(),
-                }
-            })
-            .reduce(HashSet::new, |mut acc, item| {
-                acc.extend(item);
-                acc
-            });
+            .filter_map(|path| fs::read_to_string(path).ok())
+            .flat_map_iter(|content| self.scan_string(&content))
+            .collect();
 
-        Ok(classes)
+        let mut sorted: Vec<String> = combined.into_iter().collect();
+        sorted.sort();
+        Ok(sorted)
     }
 }

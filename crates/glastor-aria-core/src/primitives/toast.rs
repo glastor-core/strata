@@ -9,7 +9,9 @@
 
 use crate::attributes::{AriaAttributes, AriaRole};
 use crate::fsm::{StateMachine, TransitionResult};
-use std::collections::VecDeque;
+use alloc::collections::VecDeque;
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// Unique toast identifier.
 pub type ToastId = String;

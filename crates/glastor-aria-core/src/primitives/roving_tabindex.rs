@@ -7,6 +7,8 @@
 
 use crate::attributes::AriaOrientation;
 use crate::fsm::{StateMachine, TransitionResult};
+use alloc::string::String;
+use alloc::vec::Vec;
 
 /// Navigation direction for keyboard roving.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

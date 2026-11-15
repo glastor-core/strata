@@ -8,17 +8,18 @@ set -euo pipefail
 # 3. wait 30s for crates.io index propagation
 # 4. glastor-ui-cli
 
-DRY_RUN=""
-TOKEN=""
+PUBLISH_ARGS=()
+IS_DRY_RUN=false
 
 while [[ $# -gt 0 ]]; do
-  case $1 in
+  case "$1" in
     --dry-run)
-      DRY_RUN="--dry-run"
+      PUBLISH_ARGS+=("--dry-run")
+      IS_DRY_RUN=true
       shift
       ;;
     --token)
-      TOKEN="--token $2"
+      export CARGO_REGISTRY_TOKEN="$2"
       shift 2
       ;;
     *)
@@ -35,26 +36,27 @@ echo "========================================================"
 # 1. Pre-flight verification
 echo -e "\n[Paso 1/4] Ejecutando suite de pruebas y linters..."
 cargo fmt --all --check
-cargo clippy --workspace --all-targets -- -D warnings
+cargo clippy --workspace --all-targets --all-features -- -D warnings
+cargo check -p glastor-aria-core --no-default-features
 cargo test --workspace --all-features
 
 # 2. Publish glastor-aria-core
 echo -e "\n[Paso 2/4] Publicando glastor-aria-core v0.1.0..."
-cargo publish -p glastor-aria-core ${DRY_RUN} ${TOKEN}
+cargo publish -p glastor-aria-core "${PUBLISH_ARGS[@]}"
 
 # 3. Publish glastor-css-binder
 echo -e "\n[Paso 3/4] Publicando glastor-css-binder v0.1.0..."
-cargo publish -p glastor-css-binder ${DRY_RUN} ${TOKEN}
+cargo publish -p glastor-css-binder "${PUBLISH_ARGS[@]}"
 
 # 4. Wait for propagation if not dry-run
-if [[ -z "${DRY_RUN}" ]]; then
+if [[ "${IS_DRY_RUN}" == "false" ]]; then
   echo -e "\n[Pausa] Esperando 30 segundos para actualización del índice de crates.io..."
   sleep 30
 fi
 
 # 5. Publish glastor-ui-cli
 echo -e "\n[Paso 4/4] Publicando glastor-ui-cli v0.1.0..."
-cargo publish -p glastor-ui-cli ${DRY_RUN} ${TOKEN}
+cargo publish -p glastor-ui-cli "${PUBLISH_ARGS[@]}"
 
 echo -e "\n========================================================"
 echo "  ¡Publicación completada exitosamente!"
@@ -62,4 +64,3 @@ echo "  https://crates.io/crates/glastor-aria-core"
 echo "  https://crates.io/crates/glastor-css-binder"
 echo "  https://crates.io/crates/glastor-ui-cli"
 echo "========================================================"
-

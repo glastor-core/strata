@@ -150,6 +150,8 @@ mod tests {
         assert!(result.is_ok());
 
         let generated_css = fs::read_to_string(&output_css).expect("read generated css");
+        assert!(generated_css.contains(":root{"));
+        assert!(generated_css.contains("--primary:#18181b;"));
         assert!(generated_css.contains(".flex{display:flex;}"));
         assert!(generated_css.contains(".items-center{align-items:center;}"));
         assert!(generated_css.contains(".p-4{padding:1rem;}"));

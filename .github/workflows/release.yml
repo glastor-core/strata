@@ -6,15 +6,30 @@ on:
       - 'v*'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   publish-crates:
     name: Publish to Crates.io
     runs-on: ubuntu-latest
+    env:
+      CARGO_TERM_COLOR: always
+      RUSTFLAGS: "-D warnings"
     steps:
       - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Pre-flight Quality & Security Gate
+        run: |
+          cargo fmt --all --check
+          cargo clippy --workspace --all-targets --all-features
+          cargo check -p glastor-aria-core --no-default-features
+          cargo test --workspace --all-features
+
       - name: Validate CARGO_REGISTRY_TOKEN secret
         env:
           TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
@@ -23,13 +38,21 @@ jobs:
             echo "::error::Falta configurar el secret CARGO_REGISTRY_TOKEN en GitHub Settings -> Secrets and variables -> Actions."
             exit 1
           fi
+
       - name: Publish glastor-aria-core
-        run: cargo publish -p glastor-aria-core --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish -p glastor-aria-core
+
       - name: Publish glastor-css-binder
-        run: cargo publish -p glastor-css-binder --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish -p glastor-css-binder
+
       - name: Wait for crates.io index propagation
         run: sleep 30
+
       - name: Publish glastor-ui-cli
-        run: cargo publish -p glastor-ui-cli --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
-
-
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish -p glastor-ui-cli

@@ -46,7 +46,7 @@ impl AccessibilityLinter {
     /// Recursively scans a directory and lints all `.rs`, `.rsx`, and `.html` files.
     pub fn lint_directory(&self, dir: &Path) -> Result<Vec<A11yDiagnostic>, std::io::Error> {
         let mut diagnostics = Vec::new();
-        self.walk_and_lint(dir, &mut diagnostics)?;
+        self.walk_and_lint(dir, &mut diagnostics, 0)?;
         Ok(diagnostics)
     }
 
@@ -54,14 +54,19 @@ impl AccessibilityLinter {
         &self,
         current: &Path,
         diagnostics: &mut Vec<A11yDiagnostic>,
+        depth: usize,
     ) -> Result<(), std::io::Error> {
-        if !current.exists() {
+        if depth > 32 || !current.exists() {
             return Ok(());
         }
 
         if current.is_dir() {
             for entry in fs::read_dir(current)? {
                 let entry = entry?;
+                let file_type = entry.file_type()?;
+                if file_type.is_symlink() {
+                    continue;
+                }
                 let path = entry.path();
                 // Skip target, dist, node_modules, and git directories
                 if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
@@ -74,7 +79,7 @@ impl AccessibilityLinter {
                         continue;
                     }
                 }
-                self.walk_and_lint(&path, diagnostics)?;
+                self.walk_and_lint(&path, diagnostics, depth + 1)?;
             }
         } else if let Some(ext) = current.extension().and_then(|e| e.to_str()) {
             if matches!(ext, "rs" | "rsx" | "html") {

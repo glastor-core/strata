@@ -5,6 +5,9 @@
 //! sentinels and wrapping around, while strictly restoring initial focus on exit.
 
 use crate::fsm::{StateMachine, TransitionResult};
+use alloc::string::String;
+use alloc::vec;
+use alloc::vec::Vec;
 
 /// Identifiers for focus trap boundary sentinels.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

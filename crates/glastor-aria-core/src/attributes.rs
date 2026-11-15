@@ -2,6 +2,8 @@
 //!
 //! Enforces WCAG compliance at compile-time instead of error-prone string manipulation.
 
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use core::fmt;
 
 #[cfg(feature = "serde")]
