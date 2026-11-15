@@ -8,6 +8,13 @@
 [![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg?style=flat-square)](LICENSE-MIT)
 [![Rust 2024](https://img.shields.io/badge/rust-2024%20edition-orange.svg?style=flat-square)](https://www.rust-lang.org)
 [![Protected Branch](https://img.shields.io/badge/branch-main%20%5Bprotected%5D-success.svg?style=flat-square)](.github/BRANCH_PROTECTION.md)
+<br>
+[![Use this template](https://img.shields.io/badge/Template-Use_this_template-2ea44f?style=flat-square&logo=github)](https://github.com/glastor-core/strata/generate)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/glastor-core/strata)
+[![Watch on GitHub](https://img.shields.io/github/watchers/glastor-core/strata?style=social&label=Watch)](https://github.com/glastor-core/strata/watchers)
+[![Fork on GitHub](https://img.shields.io/github/forks/glastor-core/strata?style=social&label=Fork)](https://github.com/glastor-core/strata/fork)
+[![Star on GitHub](https://img.shields.io/github/stars/glastor-core/strata?style=social)](https://github.com/glastor-core/strata)
+[![Follow @glastor-dev](https://img.shields.io/github/followers/glastor-dev?label=Follow%20%40glastor-dev&style=social)](https://github.com/glastor-dev)
 
 > **Next-generation, zero-Node.js headless accessibility & style bundling engine for Rust web applications (Leptos, Dioxus, Yew).**
 
@@ -144,6 +151,13 @@ Compiles the zero-Node CSS bundle automatically during `build.rs` and runs the F
 ## Interactive Showcase
 
 To preview the live interactive showcase landing page, open `index.html` in any web browser.
+
+---
+
+## ⚡ Template & Community Updates
+
+- **Use as Boilerplate**: Click **[Use this template](https://github.com/glastor-core/strata/generate)** to scaffold a zero-Node WebAssembly & Rust frontend application.
+- **Stay Updated**: Click **Watch** (top-right) and select **Custom ➔ Releases** for updates on `glastor-aria-wasm` and UI engine releases.
 
 ---
 
