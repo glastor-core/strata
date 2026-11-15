@@ -32,7 +32,7 @@ fn apply_dom_effect(effect: DomDialogEffect<'_>) {
 #[component]
 fn App() -> impl IntoView {
     let state_signal = RwSignal::new(DialogState::Closed);
-    let fsm = ReactiveFsm::new(
+    let fsm = StoredValue::new(ReactiveFsm::new(
         DialogFsm::new("strata-modal"),
         FnState::new(
             move || state_signal.get(),
@@ -41,13 +41,9 @@ fn App() -> impl IntoView {
         FnSink::new(|action: DialogAction| {
             apply_dom_effect(action.to_dom_effect("strata-modal-trigger", "strata-modal-close"));
         }),
-    );
+    ));
 
-    let is_open = move || fsm.state() == DialogState::Open;
-    let fsm_open = fsm.clone();
-    let fsm_close = fsm.clone();
-    let fsm_backdrop = fsm.clone();
-    let fsm_keydown = fsm.clone();
+    let is_open = move || state_signal.get() == DialogState::Open;
 
     view! {
         <main class="flex items-center justify-center p-6">
@@ -64,7 +60,9 @@ fn App() -> impl IntoView {
                     aria-controls="strata-modal"
                     class="inline-flex items-center justify-center px-4 py-2 rounded-md font-medium bg-primary text-primary-foreground hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2"
                     on:click=move |_| {
-                        fsm_open.send(DialogEvent::OpenTriggerClicked);
+                        fsm.with_value(|f| {
+                            f.send(DialogEvent::OpenTriggerClicked);
+                        });
                     }
                 >
                     "Open Accessible Modal"
@@ -75,12 +73,16 @@ fn App() -> impl IntoView {
                 <div
                     class="modal-backdrop flex items-center justify-center p-4"
                     on:click=move |_| {
-                        fsm_backdrop.send(DialogEvent::OutsidePointerDown);
+                        fsm.with_value(|f| {
+                            f.send(DialogEvent::OutsidePointerDown);
+                        });
                     }
                     on:keydown=move |ev: web_sys::KeyboardEvent| {
                         if ev.key() == "Escape" {
                             ev.prevent_default();
-                            fsm_keydown.send(DialogEvent::EscapePressed);
+                            fsm.with_value(|f| {
+                                f.send(DialogEvent::EscapePressed);
+                            });
                         }
                     }
                 >
@@ -105,7 +107,9 @@ fn App() -> impl IntoView {
                                 type="button"
                                 class="px-4 py-2 rounded-md font-medium bg-primary text-primary-foreground hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2"
                                 on:click=move |_| {
-                                    fsm_close.send(DialogEvent::CloseTriggerClicked);
+                                    fsm.with_value(|f| {
+                                        f.send(DialogEvent::CloseTriggerClicked);
+                                    });
                                 }
                             >
                                 "Close"

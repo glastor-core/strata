@@ -31,11 +31,14 @@ fn main() {
     );
 
     // 3. Simulated component markup containing utility classes
-    let _simulated_markup = r#"
+    let simulated_markup = r#"
         <div class="flex items-center justify-between p-4 bg-primary text-primary-foreground rounded-lg hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 dark:bg-black w-[350px]">
             <span>Accessible Modal Ready</span>
         </div>
     "#;
 
-    println!("\nZero-Node CSS bundle compiled into dist/style.min.css during build.rs!");
+    println!(
+        "\nZero-Node CSS bundle compiled into dist/style.min.css during build.rs ({} bytes markup scanned)!",
+        simulated_markup.len()
+    );
 }

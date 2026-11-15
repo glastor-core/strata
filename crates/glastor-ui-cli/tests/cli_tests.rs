@@ -17,7 +17,7 @@ fn test_cli_add_component_and_mod_rs() {
 
     let injected = ComponentInjector::inject_component(button_comp, &components_dir)
         .expect("injection succeeds");
-    assert!(!injected.is_empty());
+    assert_eq!(injected.len(), 1);
 
     // Check button.rs was created
     let button_rs = components_dir.join("button.rs");
@@ -143,7 +143,7 @@ fn test_accessibility_linter_diagnostics() {
     let mut clean_diags = Vec::new();
     let good_btn = r#"<button aria-label="Close modal">✕</button>"#;
     linter.lint_file_content(Path::new("test.rsx"), good_btn, &mut clean_diags);
-    assert!(clean_diags.is_empty());
+    assert_eq!(clean_diags.len(), 0);
 }
 
 #[test]

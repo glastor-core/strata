@@ -29,7 +29,6 @@ clap = { workspace = true }
 thiserror = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-glastor-aria-core = { workspace = true }
 glastor-css-binder = { workspace = true }
 
 [dev-dependencies]
