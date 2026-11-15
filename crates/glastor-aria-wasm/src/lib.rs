@@ -49,10 +49,20 @@ pub extern "C" fn dialog_transition(event_id: u32) -> u32 {
             2 => DialogEvent::CloseTriggerClicked,
             3 => DialogEvent::EscapePressed,
             4 => DialogEvent::OutsidePointerDown,
-            _ => return if *fsm.state() == DialogState::Open { 1 } else { 0 },
+            _ => {
+                return if *fsm.state() == DialogState::Open {
+                    1
+                } else {
+                    0
+                };
+            }
         };
         let _actions = fsm.transition(event);
-        if *fsm.state() == DialogState::Open { 1 } else { 0 }
+        if *fsm.state() == DialogState::Open {
+            1
+        } else {
+            0
+        }
     })
 }
 
@@ -60,7 +70,11 @@ pub extern "C" fn dialog_transition(event_id: u32) -> u32 {
 #[unsafe(no_mangle)]
 pub extern "C" fn dialog_is_open() -> u32 {
     DIALOG.with(|d| {
-        if *d.borrow().state() == DialogState::Open { 1 } else { 0 }
+        if *d.borrow().state() == DialogState::Open {
+            1
+        } else {
+            0
+        }
     })
 }
 
@@ -68,8 +82,14 @@ pub extern "C" fn dialog_is_open() -> u32 {
 #[unsafe(no_mangle)]
 pub extern "C" fn accordion_init(count: u32, multiple: u32) -> u32 {
     ACCORDION.with(|a| {
-        let items: Vec<String> = (0..count.min(8)).map(|i| format!("item-{}", i + 1)).collect();
-        let mode = if multiple == 1 { AccordionMode::Multiple } else { AccordionMode::Single };
+        let items: Vec<String> = (0..count.min(8))
+            .map(|i| format!("item-{}", i + 1))
+            .collect();
+        let mode = if multiple == 1 {
+            AccordionMode::Multiple
+        } else {
+            AccordionMode::Single
+        };
         *a.borrow_mut() = AccordionFsm::new(items, mode);
         0
     })
@@ -108,7 +128,8 @@ pub extern "C" fn spring_evaluate(k: f32, c: f32, m: f32, t: f32) -> f32 {
         // Underdamped (oscillatory)
         let omega_d = omega_n * (1.0 - zeta * zeta).sqrt();
         let env = (-zeta * omega_n * t).exp();
-        1.0 - env * ((omega_d * t).cos() + (zeta / (1.0 - zeta * zeta).sqrt()) * (omega_d * t).sin())
+        1.0 - env
+            * ((omega_d * t).cos() + (zeta / (1.0 - zeta * zeta).sqrt()) * (omega_d * t).sin())
     } else {
         // Critically damped or overdamped
         1.0 - (-omega_n * t).exp()
