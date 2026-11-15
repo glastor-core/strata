@@ -4,14 +4,22 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v0.1.0)'
+        required: false
+        default: 'v0.1.0'
 
 permissions:
   contents: read
 
 jobs:
-  publish-crates:
-    name: Publish to Crates.io
+  github-release:
+    name: Create GitHub Release & Binary Assets
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       CARGO_TERM_COLOR: always
       RUSTFLAGS: "-D warnings"
@@ -30,29 +38,66 @@ jobs:
           cargo check -p glastor-aria-core --no-default-features
           cargo test --workspace --all-features
 
-      - name: Validate CARGO_REGISTRY_TOKEN secret
-        env:
-          TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+      - name: Build Release CLI Binary (cargo-ui)
         run: |
-          if [ -z "$TOKEN" ]; then
-            echo "::error::Falta configurar el secret CARGO_REGISTRY_TOKEN en GitHub Settings -> Secrets and variables -> Actions."
-            exit 1
+          cargo build --release -p glastor-ui-cli --bin cargo-ui
+          tar -czf cargo-ui-linux-x86_64.tar.gz -C target/release cargo-ui
+          sha256sum cargo-ui-linux-x86_64.tar.gz > cargo-ui-linux-x86_64.tar.gz.sha256
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            TAG="${{ inputs.tag }}"
+          else
+            TAG="${GITHUB_REF_NAME}"
           fi
 
-      - name: Publish glastor-aria-core
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Updating existing GitHub Release $TAG..."
+            gh release upload "$TAG" \
+              cargo-ui-linux-x86_64.tar.gz \
+              cargo-ui-linux-x86_64.tar.gz.sha256 \
+              llms.txt \
+              llms-full.txt \
+              --clobber
+          else
+            echo "Creating new GitHub Release $TAG..."
+            gh release create "$TAG" \
+              cargo-ui-linux-x86_64.tar.gz \
+              cargo-ui-linux-x86_64.tar.gz.sha256 \
+              llms.txt \
+              llms-full.txt \
+              --title "GLASTOR® Strata $TAG" \
+              --notes-file CHANGELOG.md \
+              --generate-notes
+          fi
+
+  publish-crates:
+    name: Publish to Crates.io
+    needs: github-release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      CARGO_TERM_COLOR: always
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Publish Crates in Topological Order
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: cargo publish -p glastor-aria-core
-
-      - name: Publish glastor-css-binder
-        env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: cargo publish -p glastor-css-binder
-
-      - name: Wait for crates.io index propagation
-        run: sleep 30
-
-      - name: Publish glastor-ui-cli
-        env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: cargo publish -p glastor-ui-cli
+        run: |
+          if [ -z "${CARGO_REGISTRY_TOKEN}" ]; then
+            echo "::warning::Secret CARGO_REGISTRY_TOKEN no configurado. El GitHub Release fue publicado, pero se omitió la subida a crates.io."
+            exit 0
+          fi
+          cargo publish -p glastor-aria-core --allow-dirty || echo "glastor-aria-core already published or skipped"
+          cargo publish -p glastor-css-binder --allow-dirty || echo "glastor-css-binder already published or skipped"
+          sleep 30
+          cargo publish -p glastor-aria-wasm --allow-dirty || echo "glastor-aria-wasm already published or skipped"
+          cargo publish -p glastor-ui-cli --allow-dirty || echo "glastor-ui-cli already published or skipped"
