@@ -10,7 +10,7 @@ members = [
 exclude = ["examples/leptos-modal-demo"]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 rust-version = "1.85.0"
 authors = ["GLASTOR® Core Engineering Team <engineering@glastor.es>"]
@@ -21,8 +21,8 @@ keywords = ["accessibility", "ui", "wasm", "leptos", "strata"]
 categories = ["gui", "web-programming", "wasm", "development-tools"]
 
 [workspace.dependencies]
-glastor-aria-core = { path = "crates/glastor-aria-core", version = "0.1.0" }
-glastor-css-binder = { path = "crates/glastor-css-binder", version = "0.1.0" }
+glastor-aria-core = { path = "crates/glastor-aria-core", version = "0.1.1" }
+glastor-css-binder = { path = "crates/glastor-css-binder", version = "0.1.1" }
 serde = { version = "1.0.218", features = ["derive"] }
 serde_json = "1.0.139"
 thiserror = "2.0.12"

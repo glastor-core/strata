@@ -8,6 +8,7 @@ license.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation = "https://docs.rs/glastor-aria-wasm"
+readme = "README.md"
 keywords.workspace = true
 categories.workspace = true
 description = "WebAssembly runtime bridge for GLASTOR Strata headless accessibility FSMs and harmonic motion physics."
